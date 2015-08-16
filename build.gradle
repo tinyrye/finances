@@ -1,0 +1,32 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'io.ratpack:ratpack-gradle:0.9.19'
+    }
+}
+
+apply plugin: 'io.ratpack.ratpack-groovy'
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'com.tinyrye'
+version = '1.0.0-SNAPSHOT'
+mainClassName = 'com.tinyrye.Application'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.1.1'
+    compile group: 'com.tinyrye', name: 'jdbc-operations', version: '1.0.0-SNAPSHOT'
+    runtime group: 'postgresql', name: 'postgresql', version: '9.2-1000.jdbc4'
+}
+
+compileJava {
+    options.compilerArgs = ['-Xlint:unchecked']
+}
