@@ -4,13 +4,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.List;
 import javax.sql.DataSource;
 
 import com.google.common.base.Joiner;
 
 import com.tinyrye.jdbc.DaoStatementLocator;
 import com.tinyrye.jdbc.InsertResult;
+import com.tinyrye.jdbc.ResultSetValueConverter;
 import com.tinyrye.jdbc.SQLInsert;
 import com.tinyrye.jdbc.SQLQuery;
 import com.tinyrye.jdbc.SQLUpdate;
@@ -27,13 +31,14 @@ public class AccountsDao
     public AccountsDao(DataSource datasource)
     {
         DaoStatementLocator statementLocator = new DaoStatementLocator(getClass());
+        final ResultSetValueConverter resultSetConverter = new ResultSetValueConverter();
 
         holderInsert = new SQLInsert(datasource)
             .sql("INSERT INTO account_holder (first_name, intermediate_names, last_name, email)\n" +
                  "VALUES (?, ?, ?, ?)");
 
         accountInsert = new SQLInsert(datasource)
-            .sql("INSERT INTO account (account_holder_id, institution_name, institution_account_id, institution_account_name, account_established_at)\n" +
+            .sql("INSERT INTO account (account_holder_id, institution_name, institution_account_id, institution_account_name, established_by_institution_at)\n" +
                  "VALUES (?, ?, ?, ?, ?)");
 
         byIdSelect = new SQLQuery<Account>(datasource)
@@ -43,13 +48,14 @@ public class AccountsDao
                     .holder(new AccountHolder()
                         .id(resultSet.getInt("holder.id"))
                         .firstName(resultSet.getString("holder.firstName"))
-                        .intermediateNames(Arrays.asList(resultSet.getString("intermediateNames").split(",")))
+                        .intermediateNames((List<String>) resultSetConverter.convert(resultSet, List.class, "holder.intermediateNames"))
                         .lastName(resultSet.getString("holder.lastName"))
                         .email(resultSet.getString("holder.email")))
                     .institutionName(resultSet.getString("institutionName"))
                     .institutionAccountId(resultSet.getString("institutionAccountId"))
                     .institutionAccountName(resultSet.getString("institutionAccountName"))
-                    .establishedByInstitutionAt(Instant.ofEpochMilli(resultSet.getTimestamp("establishedByInstitutionAt").getTime()))
+                    .establishedByInstitutionAt(resultSetConverter.convert(
+                        resultSet, OffsetDateTime.class, "establishedByInstitutionAt"))
             )
             .sql(statementLocator.get("byIdSelect"));
     }
@@ -67,7 +73,7 @@ public class AccountsDao
     
     public void insert(Account account)
     {
-        if (account.holder == null) {
+        if (account.holder.id == null) {
             insert(account.holder);
         }
         accountInsert.call(() ->
@@ -79,6 +85,7 @@ public class AccountsDao
     }
     
     public Account getById(Integer id) {
+        System.out.println(String.format("Going with SQL: %s", new DaoStatementLocator(getClass()).get("byIdSelect")));
         return byIdSelect.callForFirst(() -> Arrays.asList(id));
     }
 }

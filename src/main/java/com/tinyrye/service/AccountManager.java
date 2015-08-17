@@ -3,6 +3,7 @@ package com.tinyrye.service;
 import com.tinyrye.dao.AccountsDao;
 import com.tinyrye.model.Account;
 import com.tinyrye.model.AccountHolder;
+import com.tinyrye.model.AccountSummary;
 import com.tinyrye.model.EntityCreation;
 
 public class AccountManager
@@ -23,5 +24,13 @@ public class AccountManager
         accountsDao.insert(account);
         return new EntityCreation().id(account.id).successful(true)
                     .message("Your account was added to the system.");
+    }
+
+    public Account getById(Integer id) {
+        return accountsDao.getById(id);
+    }
+
+    public AccountSummary getSummary(Integer id) {
+        return new AccountSummary().account(accountsDao.getById(id));
     }
 }

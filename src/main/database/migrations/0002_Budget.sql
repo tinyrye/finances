@@ -1,7 +1,7 @@
 CREATE TABLE budget (
     id SERIAL PRIMARY KEY,
     account_id INTEGER REFERENCES account(id),
-    owning_budget_id INTEGER REFERENCES budget(id)
+    owning_budget_id INTEGER REFERENCES budget(id),
     lifecycle_start_at TIMESTAMP,
     lifecycle_end_at TIMESTAMP,
     record_creation_at TIMESTAMP DEFAULT NOW()
@@ -29,7 +29,7 @@ CREATE TABLE budget_item (
     amount REAL,
     budget_recurrence_id INTEGER REFERENCES budget_recurrence(id),
     account_id INTEGER REFERENCES account(id),
-    owning_budget_id INTEGER REFERENCES budget(id)
+    owning_budget_id INTEGER REFERENCES budget(id),
     lifecycle_start_at TIMESTAMP,
     lifecycle_end_at TIMESTAMP,
     record_creation_at TIMESTAMP DEFAULT NOW()

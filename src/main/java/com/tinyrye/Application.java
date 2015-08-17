@@ -8,12 +8,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import ratpack.func.Action;
+import ratpack.handling.Handler;
 import ratpack.jackson.Jackson;
 import ratpack.registry.RegistrySpec;
 import ratpack.server.RatpackServer;
 
 import com.tinyrye.action.*;
 import com.tinyrye.dao.*;
+import com.tinyrye.model.*;
 import com.tinyrye.service.*;
 
 public class Application implements Runnable
@@ -37,6 +39,7 @@ public class Application implements Runnable
                 registrySpec.add(new AccountManager(new AccountsDao(primaryDataSource())))
                     .add(new CreateAccount())
                     .add(new CreateAccountHolder())
+                    .add(new GetAccount())
                     .add(new GetAccountSummary())
                     .add(new ListExpenses())
                     .with(jsonObjectSerdeRegistryAction);
@@ -47,6 +50,8 @@ public class Application implements Runnable
             .handlers(chain -> chain
                 .post("account", CreateAccount.class)
                 .post("account/holder", CreateAccountHolder.class)
+                .get("account/:id", addEntityIdHandler)
+                .get("account/:id", GetAccount.class)
                 .get("account/:id/summary", GetAccountSummary.class)
                 .get("account/:id/expenses", ListExpenses.class)
             )));
@@ -61,9 +66,15 @@ public class Application implements Runnable
         Jackson.Init.register(registrySpec, objectSerde, objectSerde.writer());
     });
 
+    protected Handler addEntityIdHandler = (exchange -> {
+        System.out.println(String.format("Handling request: url=%s", exchange.getRequest().getUri()));
+        exchange.getRequest().add(new EntityId(new Integer(exchange.getPathTokens().get("id"))));
+        exchange.next();
+    });
+    
     protected DataSource primaryDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setUrl("jdbc:postgresql://localhost:5433/personal_financial_accounting");
+        dataSource.setUrl("jdbc:postgresql://localhost:5433/finances");
         dataSource.setUsername("professorfalkin");
         dataSource.setPassword("joshua");
         dataSource.setDriverClassName("org.postgresql.Driver");

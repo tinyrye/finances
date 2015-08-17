@@ -1,8 +1,9 @@
 package com.tinyrye.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class AccountHolder
+public class AccountHolder implements Serializable
 {
     public Integer id;
     public String firstName;

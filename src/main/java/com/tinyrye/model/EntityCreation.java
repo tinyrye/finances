@@ -1,6 +1,8 @@
 package com.tinyrye.model;
 
-public class EntityCreation
+import java.io.Serializable;
+
+public class EntityCreation implements Serializable
 {
     public Integer id;
     public boolean successful;
