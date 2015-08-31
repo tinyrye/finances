@@ -9,11 +9,9 @@ public class AccountSummary implements Serializable
 {
     public Account account;
     public Double balance;
-    public List<Expense> recentExpenses = new ArrayList<Expense>();
-    public OffsetDateTime lastTransactionAt;
-
+    public List<AccountEntry> recentTransactions = new ArrayList<AccountEntry>();
+    
     public AccountSummary account(Account account) { this.account = account; return this; }
     public AccountSummary balance(Double balance) { this.balance = balance; return this; }
-    public AccountSummary recentExpenses(List<Expense> recentExpenses) { this.recentExpenses = recentExpenses; return this; }
-    public AccountSummary lastTransactionAt(OffsetDateTime lastTransactionAt) { this.lastTransactionAt = lastTransactionAt; return this; }
+    public AccountSummary recentTransactions(List<AccountEntry> recentTransactions) { this.recentTransactions = recentTransactions; return this; }
 }

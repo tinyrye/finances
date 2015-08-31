@@ -11,7 +11,8 @@ CREATE TABLE account_holder
 CREATE TABLE account
 (
     id SERIAL PRIMARY KEY,
-    account_holder_id INTEGER NOT NULL REFERENCES account_holder(id),
+    account_holder_id INTEGER REFERENCES account_holder(id),
+    primary_for_holder BOOLEAN,
     institution_name VARCHAR(128),
     institution_account_id VARCHAR(128),
     institution_account_name VARCHAR(128),

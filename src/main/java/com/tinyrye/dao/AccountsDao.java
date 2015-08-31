@@ -14,7 +14,7 @@ import com.google.common.base.Joiner;
 
 import com.tinyrye.jdbc.DaoStatementLocator;
 import com.tinyrye.jdbc.InsertResult;
-import com.tinyrye.jdbc.ResultSetValueConverter;
+import com.tinyrye.jdbc.RowConverter;
 import com.tinyrye.jdbc.SQLInsert;
 import com.tinyrye.jdbc.SQLQuery;
 import com.tinyrye.jdbc.SQLUpdate;
@@ -26,66 +26,70 @@ public class AccountsDao
 {
     private final SQLInsert holderInsert;
     private final SQLInsert accountInsert;
-    private final SQLQuery<Account> byIdSelect;
-
+    
+    private final SQLQuery holderByIdSelect;
+    private final SQLQuery byIdSelect;
+    private final SQLQuery byHolderIdSelect;
+    
+    private final RowConverter<AccountHolder> baseAccountHolderRowConverter = (resultSet, valueUtility) ->
+        new AccountHolder()
+            .id(valueUtility.convert(resultSet, Integer.class, "id"))
+            .firstName(valueUtility.convert(resultSet, String.class, "firstName"))
+            .intermediateNames((List<String>) valueUtility.convert(resultSet, List.class, "intermediateNames"))
+            .lastName(valueUtility.convert(resultSet, String.class, "lastName"))
+            .email(valueUtility.convert(resultSet, String.class, "email"));
+    
+    private final RowConverter<Account> baseAccountRowConverter = new AccountRowConverter();
+    
     public AccountsDao(DataSource datasource)
     {
-        DaoStatementLocator statementLocator = new DaoStatementLocator(getClass());
-        final ResultSetValueConverter resultSetConverter = new ResultSetValueConverter();
-
         holderInsert = new SQLInsert(datasource)
             .sql("INSERT INTO account_holder (first_name, intermediate_names, last_name, email)\n" +
                  "VALUES (?, ?, ?, ?)");
-
+        
         accountInsert = new SQLInsert(datasource)
             .sql("INSERT INTO account (account_holder_id, institution_name, institution_account_id, institution_account_name, established_by_institution_at)\n" +
                  "VALUES (?, ?, ?, ?, ?)");
-
-        byIdSelect = new SQLQuery<Account>(datasource)
-            .rowConverter(resultSet ->
-                new Account()
-                    .id((Integer) resultSet.getInt("id"))
-                    .holder(new AccountHolder()
-                        .id(resultSet.getInt("holder.id"))
-                        .firstName(resultSet.getString("holder.firstName"))
-                        .intermediateNames((List<String>) resultSetConverter.convert(resultSet, List.class, "holder.intermediateNames"))
-                        .lastName(resultSet.getString("holder.lastName"))
-                        .email(resultSet.getString("holder.email")))
-                    .institutionName(resultSet.getString("institutionName"))
-                    .institutionAccountId(resultSet.getString("institutionAccountId"))
-                    .institutionAccountName(resultSet.getString("institutionAccountName"))
-                    .establishedByInstitutionAt(resultSetConverter.convert(
-                        resultSet, OffsetDateTime.class, "establishedByInstitutionAt"))
-            )
-            .sql(statementLocator.get("byIdSelect"));
+        
+        holderByIdSelect = new SQLQuery(datasource)
+            .sql(new DaoStatementLocator(getClass(), "holderByIdSelect"));
+        
+        byIdSelect = new SQLQuery(datasource)
+            .sql(new DaoStatementLocator(getClass(), "byIdSelect"));
+        
+        byHolderIdSelect = new SQLQuery(datasource)
+            .sql(new DaoStatementLocator(getClass(), "byHolderIdSelect"));
     }
     
     public void insert(AccountHolder holder)
     {
-        holderInsert.call(() ->
+        holderInsert.callForFirstGeneratedKey(() ->
                 Arrays.asList(holder.firstName,
                     holder.intermediateNames != null ? Joiner.on(",").join(holder.intermediateNames) : null,
-                    holder.lastName, holder.email))
-            .generatedKeys.stream().forEachOrdered(rowGeneratedKey ->
-                holder.id = rowGeneratedKey.get(0)
-            );
+                    holder.lastName, holder.email),
+                holder, AccountHolder::id);
     }
     
     public void insert(Account account)
     {
-        if (account.holder.id == null) {
-            insert(account.holder);
-        }
-        accountInsert.call(() ->
-                Arrays.asList(account.holder.id, account.institutionName, account.institutionAccountId,
-                    account.institutionAccountName, account.establishedByInstitutionAt))
-            .generatedKeys.stream().forEachOrdered(rowGeneratedKey ->
-                account.id = rowGeneratedKey.get(0)
-            );
+        accountInsert.callForFirstGeneratedKey(() ->
+                Arrays.asList((account.holder != null ? account.holder.id : null), account.institutionName, account.institutionAccountId,
+                    account.institutionAccountName, account.establishedByInstitutionAt),
+                account, Account::id);
+    }
+    
+    public AccountHolder getHolderById(Integer id) {
+        return holderByIdSelect.call(() -> Arrays.asList(id)).first(baseAccountHolderRowConverter)
+                    .orElse(null);
     }
     
     public Account getById(Integer id) {
-        System.out.println(String.format("Going with SQL: %s", new DaoStatementLocator(getClass()).get("byIdSelect")));
-        return byIdSelect.callForFirst(() -> Arrays.asList(id));
+        return byIdSelect.call(() -> Arrays.asList(id)).first(baseAccountRowConverter)
+                    .orElse(null);
+    }
+    
+    public Account getActiveByHolderId(Integer id) {
+        return byHolderIdSelect.call(() -> Arrays.asList(id)).first(baseAccountRowConverter)
+                    .orElse(null);
     }
 }

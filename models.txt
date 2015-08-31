@@ -1,0 +1,48 @@
+Budget: {
+    id: integer
+    name: string
+    active: boolean
+}
+
+Evolution:
+  -> arch-general:
+       -> flat models versus hierarchical
+       -> builders
+       -> make interfaces for models?
+  -> versioning: does same budget have versioned items and/or recurrence schedules?
+  -> should budgets have lifecycles even though from year to year they would be nearly
+     the same?  copy into new and restire the old?
+  -> scope: would budgets be partitioned/scoped to focus on certain parts of a user's
+     finances such that user would need multiple, active budgets to complete the picture?
+
+BudgetItem: {
+  id: integer
+  code: string
+  description: string
+  amount: double
+  transactsOn: RecurrenceSchedule
+  merchant: string
+}
+
+RecurrenceSchedule: {
+  start: datetime
+  end: datetime
+  recurrence: Recurrence
+}
+
+Recurrence: <{
+  type: function() returns string default { return getClass().getSimpleName() }
+  next: function(datetime) returns datetime
+}>
+
+FixedIntervalRecurrence: extends Recurrence {
+  magnitude: integer
+  unit: chronoUnit
+  next: function(datetime x) { x.plus(magnitude, unit) }
+}
+
+CustomDatesRecurrence: extends Recurrence {
+  fullSchedule: boolean // does model currently have the full schedule loaded?
+  customSchedule: list<datetime>
+  next: function(datetime x) { customSchedule.get(customSchedule.indexOf(x) + 1) }
+}
