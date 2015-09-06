@@ -10,9 +10,9 @@ import com.tinyrye.model.AccountHolder;
 import com.tinyrye.model.Budget;
 import com.tinyrye.model.BudgetItem;
 import com.tinyrye.model.EntityId;
-import com.tinyrye.model.CustomRecurrenceSchedule;
-import com.tinyrye.model.FixedRecurrenceInterval;
-import com.tinyrye.model.Recurrence;
+import com.tinyrye.model.CustomOccurrenceSchedule;
+import com.tinyrye.model.FixedOccurrenceInterval;
+import com.tinyrye.model.OccurrenceSchedule;
 
 public class BudgetService
 {
@@ -30,29 +30,50 @@ public class BudgetService
         return new HolderBudgetManager(serviceExchange, holderReference);
     }
     
-    public Recurrence getRecurrenceById(Integer id) {
-        return serviceExchange.get(BudgetDao.class).getRecurrenceById(id);
+    public OccurrenceSchedule getOccurrenceScheduleById(Integer id) {
+        return serviceExchange.get(BudgetDao.class).getOccurrenceScheduleById(id);
     }
-
-    public Recurrence getOrCreate(Recurrence recurrence)
+    
+    public OccurrenceSchedule getOrCreate(OccurrenceSchedule occurrence)
     {
-        if (recurrence.id == null)
-        {
-            if (recurrence.method == null) {
-                throw new IllegalArgumentException("Missing recurrence strategy.");
-            }
-            else if (recurrence.method instanceof FixedRecurrenceInterval) {
-                Recurrence existingRecurrence = serviceExchange.get(BudgetDao.class).findRecurrenceByFixedInterval(recurrence);
-                if (existingRecurrence != null) recurrence.id = existingRecurrence.id;
-                else serviceExchange.get(BudgetDao.class).insert(recurrence);
-            }
-            else if (recurrence.method instanceof CustomRecurrenceSchedule) {
-                serviceExchange.get(BudgetDao.class).insert(recurrence);
-            }
-            return recurrence;
+        if (occurrence instanceof FixedOccurrenceInterval) {
+            return getOrCreate((FixedOccurrenceInterval) occurrence);
+        }
+        else if (occurrence instanceof CustomOccurrenceSchedule) {
+            return getOrCreate((CustomOccurrenceSchedule) occurrence);
         }
         else {
-            return serviceExchange.get(BudgetDao.class).getRecurrenceById(recurrence.id);
+            throw new UnsupportedOperationException("Unsupported OccurrenceSchedule type");
+        }
+    }
+    
+    protected OccurrenceSchedule getOrCreate(FixedOccurrenceInterval occurrence)
+    {
+        if (occurrence.id != null) {
+            return serviceExchange.get(BudgetDao.class).getOccurrenceScheduleById(occurrence.id);
+        }
+        else
+        {
+            FixedOccurrenceInterval existingOccurrence = serviceExchange.get(BudgetDao.class)
+                .findFixedOccurrenceInterval(occurrence);
+            if (existingOccurrence != null) {
+                occurrence.id = existingOccurrence.id;
+            }
+            else {
+                serviceExchange.get(BudgetDao.class).insert(occurrence);
+            }
+            return occurrence;
+        }
+    }
+    
+    protected OccurrenceSchedule getOrCreate(CustomOccurrenceSchedule occurrence)
+    {
+        if (occurrence.id != null) {
+            return serviceExchange.get(BudgetDao.class).getOccurrenceScheduleById(occurrence.id);
+        }
+        else {
+            serviceExchange.get(BudgetDao.class).insert(occurrence);
+            return occurrence;
         }
     }
 }

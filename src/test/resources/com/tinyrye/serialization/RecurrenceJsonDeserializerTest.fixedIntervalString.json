@@ -1,6 +1,0 @@
-[ { "recurrenceMethod": "1y" }, { "recurrenceMethod": "3yr" }, { "recurrenceMethod": "6year" },
-  { "recurrenceMethod": "2mo" }, { "recurrenceMethod": "13month" },
-  { "recurrenceMethod": "7d" }, { "recurrenceMethod": "11day" },
-  { "recurrenceMethod": "2h" }, { "recurrenceMethod": "5hr" }, { "recurrenceMethod": "10hour" },
-  { "recurrenceMethod": "23min" }, { "recurrenceMethod": "46minute" },
-  { "recurrenceMethod": "5s" }, { "recurrenceMethod": "18sec" }, { "recurrenceMethod": "34second" } ]

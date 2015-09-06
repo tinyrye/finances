@@ -16,6 +16,12 @@ public class DateTimeJsonDeserializer extends JsonDeserializer<OffsetDateTime>
     public OffsetDateTime deserialize(JsonParser parser, DeserializationContext objectParseContext)
         throws IOException, JsonProcessingException
     {
+        return deserialize(parser);
+    }
+
+    public OffsetDateTime deserialize(JsonParser parser)
+        throws IOException, JsonProcessingException
+    {
         if (parser.getCurrentToken() == JsonToken.VALUE_STRING) {
             return OffsetDateTime.parse(parser.getText(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         }

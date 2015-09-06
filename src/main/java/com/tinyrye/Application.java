@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 
@@ -23,6 +24,7 @@ import ratpack.server.RatpackServer;
 import com.tinyrye.action.*;
 import com.tinyrye.dao.*;
 import com.tinyrye.model.*;
+import com.tinyrye.serialization.WrappedInheritableJsonDeserializer;
 import com.tinyrye.service.*;
 
 public class Application implements Runnable
@@ -50,7 +52,7 @@ public class Application implements Runnable
                 .add(new ListExpenses())
                 .add(new ActiveBudgetHandler())
                 .add(new HolderActiveBudgetItemHandler())
-                .add(new BudgetRecurrenceHandler())
+                .add(new BudgetOccurrenceHandler())
                 .add(ServiceExchange.class, new ServiceExchangeImpl())
                 .with(jsonObjectSerdeRegistryAction)
             )
@@ -71,13 +73,18 @@ public class Application implements Runnable
                 .get("account/:id/expenses", addEntityIdHandler)
                 .get("account/:id/expenses", ListExpenses.class)
 
-                .path("budget/recurrence/:id", addEntityIdHandler)
-                .path("budget/recurrence/:id", BudgetRecurrenceHandler.class)
+                .path("budget/occurrence/:id", addEntityIdHandler)
+                .path("budget/occurrence/:id", BudgetOccurrenceHandler.class)
             )));
     }
     
-    protected ObjectMapper jsonObjectSerde() {
-        return new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    public static ObjectMapper jsonObjectSerde() {
+        return new ObjectMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .registerModule(new SimpleModule() 
+                .addDeserializer(OccurrenceSchedule.class,
+                    WrappedInheritableJsonDeserializer.instanceForEntity(
+                    OccurrenceSchedule.class)));
     }
     
     protected Action<? super RegistrySpec> jsonObjectSerdeRegistryAction = (registrySpec -> {

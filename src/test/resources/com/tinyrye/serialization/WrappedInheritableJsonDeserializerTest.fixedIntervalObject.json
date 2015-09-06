@@ -1,0 +1,55 @@
+[{
+  "occurrence": { "fixedInterval": {
+      "magnitude": 1,
+      "unit": "y"
+    }
+  } 
+},{
+  "occurrence": { "fixedInterval": {
+      "magnitude": 3,
+      "unit": "yr"
+    }
+  }
+},{
+  "occurrence": { "fixedInterval": {
+      "magnitude": 6,
+      "unit": "year"
+    }
+  }
+},{
+  "occurrence": { "fixedInterval": {
+      "magnitude": 2,
+      "unit": "mo"
+    }
+  }
+},{
+  "occurrence": { "fixedInterval": {
+      "magnitude": 13,
+      "unit": "mo"
+    }
+  }
+},{
+  "occurrence": { "fixedInterval": {
+      "magnitude": 7,
+      "unit": "d"
+    }
+  }
+},{
+  "occurrence": { "fixedInterval": {
+      "magnitude": 1,
+      "unit": "d"
+    }
+  }
+},{
+  "occurrence": { "fixedInterval": {
+      "magnitude": 1,
+      "unit": "mo"
+    }
+  }
+},{
+  "occurrence": { "fixedInterval": {
+      "magnitude": 1,
+      "unit": "month"
+    }
+  }
+}]

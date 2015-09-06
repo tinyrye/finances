@@ -9,42 +9,32 @@ CREATE TABLE budget (
 CREATE INDEX budget_byName ON budget(name);
 CREATE INDEX budget_byHolder ON budget(account_holder_id);
 
-CREATE TABLE budget_recurrence (
+CREATE TABLE budget_occurrence (
     id SERIAL PRIMARY KEY,
-    starts_at TIMESTAMP,
-    ends_at TIMESTAMP,
-    method_type VARCHAR(128),
+    type VARCHAR(128),
     record_creation_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE budget_recurrence_interval (
-    budget_recurrence_id INTEGER REFERENCES budget_recurrence(id),
+CREATE TABLE budget_fixed_interval_occurrence (
+    budget_occurrence_id INTEGER REFERENCES budget_occurrence(id),
+    starts_at TIMESTAMP,
+    ends_at TIMESTAMP,
     magnitude SMALLINT,
     unit VARCHAR(32),
     record_creation_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX budget_recurrence_interval_by_recurrenceFk ON budget_recurrence_interval(budget_recurrence_id);
-CREATE INDEX budget_recurrence_interval_byMagnitudeAndUnit ON budget_recurrence_interval(magnitude, unit);
+CREATE INDEX budget_fixed_interval_occurrence_by_occurrenceFk ON budget_fixed_interval_occurrence(budget_occurrence_id);
+CREATE INDEX budget_fixed_interval_occurrence_byStartEndMagnitudeAndUnit ON budget_fixed_interval_occurrence(starts_at, ends_at, magnitude, unit);
 
-CREATE TABLE budget_recurrence_timeplot (
-    budget_recurrence_id INTEGER REFERENCES budget_recurrence(id),
+CREATE TABLE budget_custom_occurrence (
+    budget_occurrence_id INTEGER REFERENCES budget_occurrence(id),
     occurs_at TIMESTAMP,
     record_creation_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX budget_recurrence_timeplot_by_recurrenceFk ON budget_recurrence_timeplot(budget_recurrence_id);
-CREATE INDEX budget_recurrence_timeplot_by_occurence ON budget_recurrence_timeplot(occurs_at);
-
-CREATE TABLE budget_recurrence_schedule (
-    id SERIAL PRIMARY KEY,
-    starts_at TIMESTAMP,
-    ends_at TIMESTAMP,
-    budget_recurrence_id INTEGER NOT NULL REFERENCES budget_recurrence(id),
-    record_creation_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE INDEX budget_recurrence_schedule_byRecurrenceId ON budget_recurrence_schedule(budget_recurrence_id);
+CREATE INDEX budget_custom_occurrence_by_occurrenceFk ON budget_custom_occurrence(budget_occurrence_id);
+CREATE INDEX budget_custom_occurrence_by_occursAt ON budget_custom_occurrence(occurs_at);
 
 CREATE TABLE budget_item_categorization (
     id SERIAL PRIMARY KEY,
@@ -64,7 +54,7 @@ CREATE TABLE budget_item (
     budget_item_categorization_id INTEGER REFERENCES budget_item_categorization(id),
     description VARCHAR(128),
     amount REAL,
-    budget_recurrence_id INTEGER REFERENCES budget_recurrence(id),
+    budget_occurrence_id INTEGER REFERENCES budget_occurrence(id),
     account_id INTEGER REFERENCES account(id),
     record_creation_at TIMESTAMP DEFAULT NOW()
 );
@@ -73,7 +63,7 @@ CREATE INDEX budget_item_byBudget ON budget_item(budget_id);
 CREATE INDEX budget_item_byItemType ON budget_item(item_type);
 CREATE INDEX budget_item_byCategorization ON budget_item(budget_item_categorization_id);
 CREATE INDEX budget_item_byAmount ON budget_item(amount);
-CREATE INDEX budget_item_byRecurrence ON budget_item(budget_recurrence_id);
+CREATE INDEX budget_item_byOccurrence ON budget_item(budget_occurrence_id);
 CREATE INDEX budget_item_byAccount ON budget_item(account_id);
 
 CREATE TABLE budget_item_occurrence (

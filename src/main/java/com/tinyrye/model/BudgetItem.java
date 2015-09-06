@@ -13,7 +13,7 @@ public class BudgetItem implements Serializable
     public List<String> categorization = new ArrayList<String>();
     public Double amount;
     public String description;
-    public Recurrence transactsOn;
+    public OccurrenceSchedule transactsOn;
     public Account intendedAccount;
     public String merchant;
     
@@ -24,7 +24,7 @@ public class BudgetItem implements Serializable
     public BudgetItem categorization(List<String> categorization) { this.categorization = categorization; return this; }
     public BudgetItem amount(Double amount) { this.amount = amount; return this; }
     public BudgetItem description(String description) { this.description = description; return this; }
-    public BudgetItem transactsOn(Recurrence transactsOn) { this.transactsOn = transactsOn; return this; }
+    public BudgetItem transactsOn(OccurrenceSchedule transactsOn) { this.transactsOn = transactsOn; return this; }
     public BudgetItem intendedAccount(Account intendedAccount) { this.intendedAccount = intendedAccount; return this; }
     public BudgetItem merchant(String merchant) { this.merchant = merchant; return this; }
 }
