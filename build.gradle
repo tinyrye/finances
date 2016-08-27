@@ -26,6 +26,12 @@ repositories {
     jcenter()
 }
 
+install {
+    repositories.mavenInstaller {
+        pom.artifactId = 'yomama'
+    }
+}
+
 compileJava {
     if (System.getProperty("compilerWarnings") != null) {
         options.compilerArgs = ['-Xlint:unchecked']
