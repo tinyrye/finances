@@ -7,7 +7,7 @@ buildscript {
     dependencies {
         classpath 'io.ratpack:ratpack-gradle:0.9.19'
         classpath "com.softwhistle:database-migrations-gradle-plugin:1.0.0-SNAPSHOT"
-        classpath 'postgresql:postgresql:9.2-1000.jdbc4'
+        classpath 'postgresql:postgresql:9.4.1209'
     }
 }
 
