@@ -1,0 +1,17 @@
+[
+  { "occurrence": { "fixedUnit": "1y" } },
+  { "occurrence": { "fixedUnit": "3yr" } },
+  { "occurrence": { "fixedUnit": "6year" } },
+  { "occurrence": { "fixedUnit": "2mo" } },
+  { "occurrence": { "fixedUnit": "13month" } },
+  { "occurrence": { "fixedUnit": "7d" } },
+  { "occurrence": { "fixedUnit": "11day" } },
+  { "occurrence": { "fixedUnit": "2h" } },
+  { "occurrence": { "fixedUnit": "5hr" } },
+  { "occurrence": { "fixedUnit": "10hour" } },
+  { "occurrence": { "fixedUnit": "23min" } },
+  { "occurrence": { "fixedUnit": "46minute" } },
+  { "occurrence": { "fixedUnit": "5s" } },
+  { "occurrence": { "fixedUnit": "18sec" } },
+  { "occurrence": { "fixedUnit": "34second" } }
+]

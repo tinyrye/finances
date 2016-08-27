@@ -1,0 +1,88 @@
+
+@JsonSerialize(using=WrappedInheritableJsonSerializer.class)
+@JsonDeserialize(using=WrappedInheritableJsonDeserializer.class)
+interface OccurrenceSchedule
+{
+    Iterator<OffsetDateTime> occurrences(OffsetDateTime start);
+}
+
+@NamedType("fixedUnit")
+class FixedUnitOccurrences implements OccurrenceSchedule {
+    OffsetDateTime startsAt;
+    OffsetDateTime endsAt;
+    Integer magnitude;
+    ChronoUnit unit;
+}
+
+@NamedType("fixedField")
+class FixedFieldOccurrences implements OccurrenceSchedule {
+    OffsetDateTime startsAt;
+    OffsetDateTime endsAt;
+    Integer magnitude;
+    ChronoField field;
+}
+
+@NamedType("customSchedule")
+class CustomOccurrenceSchedule implements OccurrenceSchedule {
+    List<OffsetDateTime> occurrences;
+}
+
+
+- - - - 
+
+[{
+    "description": "Housing",
+    "amount": 1500.00,
+    "transactsOn": {
+      "fixedUnit": {
+        "startsAt": "2015-01-01T00:00:00+00:00",
+        "magnitude": 1, "unit": "month",
+      }
+    }
+},{
+    "description": "Gas & Electric",
+    "amount": 150.00,
+    "transactsOn": {
+      "fixedField": {
+        "startsAt": "2015-05-01T00:00:00+00:00",
+        "magnitude": 1, "field": "day_of_month"
+      }
+    }
+},{
+    "description": "Dental Fillings",
+    "amount": 500.00,
+    "transactsOn": {
+      "customSchedule": [
+        "2015-10-01T00:00:00+00:00",
+        "2015-11-15T00:00:00+00:00"
+      ]
+    }
+}]
+
+
+
+
+
+
+
+
+
+referenceStartDateTime = 2015-01-01
+
+fixedField = 5:day-of-month
+
+nextHighestPrecision: function(chronoField) returns chronoField
+    = ChronoField.getRangeUnit() returns ChronoUnit (don't need the a ChronoField
+    as the next precision)
+
+--> Get algorithm to iterate from reference start date time over recurrences of fixedField
+--> ie. 2015-01-01 to 2015-01-05, 2015-02-05, 2015-03-05, 2015-04-05 ...
+
+1. nextHighestPrecision(day_of_month) = month_of_year
+2. "2015-01-01".plus("2015-01-01".get(month_of_year) + i, month_of_year) = "2015-(01 + i)-01"
+3. "2015-(01 + i)-01".with(fixedField.field, fixedField.magnitude) = "2015-(01 + i)-05"
+
+Real Implementation:
+    return referenceDateTime.plus(nextHighestPrecision(field), i, fixedField.field,
+        fixedField.magnitude);
+

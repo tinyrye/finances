@@ -1,0 +1,29 @@
+{
+    "holder": {
+        "firstName": "Ryan",
+        "intermediateNames": [ "Patrick" ],
+        "lastName": "Small",
+        "email": "small.ryan@gmail.com"
+    },
+    "primaryAccount": {
+        "institutionName": "UWCU",
+        "institutionAccountId": "253295301",
+        "institutionAccountName": "Checking",
+        "establishedByInstitutionAt": "2005-05-30T00:00:00+00:00"
+    },
+    "activeBudget": {
+        "startsAt": "2015-01-01T00:00:00+00:00",
+        "items": [{
+            "description": "Housing Rent",
+            "amount": 1500.00,
+            "type": "EXPENSE",
+            "transactsOn": {
+                "fixedField": {
+                    "magnitude": 1,
+                    "field": "DAY_OF_MONTH"
+                }
+            },
+            "merchant": "Urban Land Interests"
+        }]
+    }
+}

@@ -1,0 +1,91 @@
+[{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 1,
+      "unit": "y"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 3,
+      "unit": "yr"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "duration": "6years",
+      "startsAt": "2015-06-25T00:00:00+00:00"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 2,
+      "unit": "mo"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 13,
+      "unit": "mo"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 7,
+      "unit": "d"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 11,
+      "unit": "d"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 2,
+      "unit": "h"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 5,
+      "unit": "hr"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 10,
+      "unit": "hour"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 23,
+      "unit": "min"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 46,
+      "unit": "minute"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 5,
+      "unit": "s"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 18,
+      "unit": "sec"
+    }
+  }
+},{
+  "occurrence": { "fixedUnit": {
+      "magnitude": 34,
+      "unit": "second"
+    }
+  }
+}]

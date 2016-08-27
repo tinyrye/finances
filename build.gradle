@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'io.ratpack:ratpack-gradle:0.9.19'
-        classpath "com.tinyrye:database-migrations-gradle-plugin:1.0.0-SNAPSHOT"
+        classpath "com.softwhistle:database-migrations-gradle-plugin:1.0.0-SNAPSHOT"
         classpath 'postgresql:postgresql:9.2-1000.jdbc4'
     }
 }
@@ -16,9 +16,9 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: "migrations"
 
-group = 'com.tinyrye'
+group = 'com.softwhistle'
 version = '1.0.0-SNAPSHOT'
-mainClassName = 'com.tinyrye.Application'
+mainClassName = 'com.softwhistle.Application'
 
 repositories {
     mavenLocal()
@@ -26,18 +26,20 @@ repositories {
     jcenter()
 }
 
+compileJava {
+    if (System.getProperty("compilerWarnings") != null) {
+        options.compilerArgs = ['-Xlint:unchecked']
+    }
+}
+
 dependencies {
     compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.1.1'
-    compile group: 'com.tinyrye', name: 'jdbc-operations', version: '1.0.0-SNAPSHOT'
+    compile group: 'com.softwhistle', name: 'jdbc-operations', version: '1.0.0-SNAPSHOT'
     runtime group: 'postgresql', name: 'postgresql', version: '9.2-1000.jdbc4'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.12'
     compile group: 'ch.qos.logback', name: 'logback-core', version: '1.1.3'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.3'
     testCompile "junit:junit:4.8.2"
-}
-
-compileJava {
-    options.compilerArgs = ['-Xlint:unchecked']
 }
 
 migrations {

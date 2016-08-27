@@ -1,0 +1,13 @@
+
+budget
+------
+name/scenario
+start-end
+items:[amount, schedule, accounts, categorization]
+
+
+budget_track
+------------
+budget - as template
+trackStart-trackEnd
+items:[budget.item as template with actual values or new item]

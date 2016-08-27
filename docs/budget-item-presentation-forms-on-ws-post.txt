@@ -1,0 +1,100 @@
+{
+  viewType: "List<BudgetItem>",
+  viewName: "groupBy:transactsOn",
+  view: {
+    "fixedField": {
+      "1 day_of_month": [{
+        "description": "House and Parking Rent", "amount": 1575.00
+      },{
+        "description": "House Power", "amount": 150.00
+      },{
+        "description": ""
+      }]
+    }
+  }
+}
+
+
+
+[{
+    "categories": ["Primary", "House"],
+    "entries": [{
+        "description": "House and Parking Rent", "amount": 1575.00,
+        "transactsOn": { "fixedField": "1 day_of_month" }
+    },{
+        "description": "Internet ISP", "amount": 65.00,
+        "transactsOn": { "fixedField": "1 day_of_month" }
+    },{
+        "description": "Phone - Verizon", "amount": 100.00,
+        "transactsOn": { "fixedField": "18 day_of_month" }
+    },{
+        "description": "House Power", "amount": 150.00,
+        "transactsOn": { "fixedField": "1 day_of_month" }
+    }]
+},{
+    "categories": ["Primary", "Car"],
+    "entries": [{
+        "description": "Lease", "amount": 480.00,
+        "transactsOn": { "fixedField": "25 day_of_month" }
+    },{
+        "description": "Insurance", "amount": 110.00,
+        "transactsOn": { "fixedField": "9 day_of_month" }
+    },{
+        "description": "Fuel", "amount": 40.00,
+        "transactsOn": { "fixedUnit": "1 month" }
+    }]
+},{
+    "categories": ["Primary", "Care"],
+    "entries": [{
+        "description": "Food", "amount": 15.00,
+        "transactsOn": { "fixedField": "1 hour_of_day" }
+    },{
+        "description": "Medical", "amount": 10.00,
+        "transactsOn": { "fixedUnit": "1 month" }
+    },{
+        "description": "Hair", "amount": 35.00,
+        "transactsOn": { "fixedUnit": "1 month" }
+    },{
+        "description": "Home-Miscellaneous", "amount": 30.00,
+        "transactsOn": { "fixedUnit": "1 month" }
+    },{
+        "description": "Clothes", "amount": 100.00,
+        "transactsOn": { "fixedUnit": "1 month" }
+    },{
+        "description": "Exercise",
+        "entries": [{
+            "description": "Shoes", "amount": 20.00,
+            "transactsOn": { "fixedUnit": "1 month" }
+        }]
+    }]
+},{
+    "categories": ["Optional", "Entertainment"],
+    "entries": [{
+        "description": "Cigars", "amount": 75.00,
+        "transactsOn": { "fixedUnit": "1 month" }
+    },{
+        "description": "Coffee", "amount": 45.00,
+        "transactsOn": { "fixedUnit": "1 month" }
+    },{
+        "description": "Restaurant-Bars", "amount": 500.00,
+        "transactsOn": { "fixedUnit": "1 month" }
+    },{
+        "categories": ["Music", "Movies", "Shows"],
+        "entries": [{
+            "description": "Netflix", "amount": 10.00,
+            "transactsOn": { "fixedUnit": "1 month" }
+        },{
+            "description": "Pandora", "amount": 10.00,
+            "transactsOn": { "fixedUnit": "1 month" }
+        }]
+    },{
+        "description": "Site:foreignpolicy.com", "amount": 5.00,
+        "transactsOn": { "fixedUnit": "1 month" }
+    }]
+},{
+    "categories": ["Work"],
+    "entries": [{
+        "description": "Github", "amount": 15.00,
+        "transactsOn": { "fixedUnit": "1 month" }
+    }]
+}]

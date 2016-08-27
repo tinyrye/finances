@@ -1,0 +1,7 @@
+projection - plugin aspects - expand on it
+    - combine account features
+budget - entry for actual expenses and comparison to actual budget.
+    - entry includes account entries as well as link (hard or soft) to
+        item(s).
+    - provides comparison to planned budget incurrences vs actual.
+account balance snapshot

@@ -1,0 +1,1 @@
+DELETE FROM budget_item WHERE budget_id = ?

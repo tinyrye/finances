@@ -1,0 +1,1 @@
+SELECT type FROM budget_occurrence_schedule WHERE id = ?
