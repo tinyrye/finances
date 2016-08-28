@@ -40,22 +40,6 @@ compileJava {
     }
 }
 
-buildRpm {
-    packageName = 'softwhistle-finances-management-webservice'
-    version = project.version.replaceAll('-SNAPSHOT', '')
-    os = 'LINUX'
-    arch = 'noarch'
-    createDirectoryEntry = true
-    
-    into '/opt/softwhistle/finances-webservice'
-    from(new File(project.buildDir, 'classes/main')) {
-        into ('classes')
-    }
-    from(new File(project.buildDir, 'resources/deploy/etc')) {
-        into ("/etc/init.d/$packageName")
-    }
-}
-
 processResources {
     from(new File(project.projectDir, 'src/main/deploy')) {
         into ('../deploy')
@@ -83,4 +67,20 @@ migrations {
     // if normal user is not superuser capable of creating/dropping databases
     // superUsername = 'professorfalkin'
     // superPassword = 'joshua'
+}
+
+buildRpm {
+    packageName = 'softwhistle-finances-management-webservice'
+    version = project.version.replaceAll('\-SNAPSHOT', '')
+    os = 'LINUX'
+    arch = 'noarch'
+    createDirectoryEntry = true
+    
+    into '/opt/softwhistle/finances-webservice'
+    from(new File(project.buildDir, 'classes/main')) {
+        into ('classes')
+    }
+    from(new File(project.buildDir, 'resources/deploy/etc')) {
+        into ("/etc/init.d/$packageName")
+    }
 }
