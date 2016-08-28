@@ -44,7 +44,7 @@ buildRpm {
     packageName = 'softwhistle-finances-management-webservice'
     version = project.version.replaceAll('-SNAPSHOT', '')
     os = 'LINUX'
-    arch = 'noarchf'
+    arch = 'noarch'
     createDirectoryEntry = true
     
     into '/opt/softwhistle/finances-webservice'
