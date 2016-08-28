@@ -70,7 +70,7 @@ migrations {
 }
 
 buildRpm {
-    packageName = 'softwhistle-finances-management-webservice'
+    packageName = 'swistle-finman'
     version = project.version.replaceAll('\\-SNAPSHOT', '')
     release = 1
     os = 'LINUX'
