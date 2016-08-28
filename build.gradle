@@ -6,15 +6,17 @@ buildscript {
     }
     dependencies {
         classpath 'io.ratpack:ratpack-gradle:0.9.19'
+        classpath "com.netflix.nebula:gradle-ospackage-plugin:2.2.6"
         classpath "com.softwhistle:database-migrations-gradle-plugin:1.0.0-SNAPSHOT"
         classpath 'org.postgresql:postgresql:9.4.1209'
     }
 }
 
-apply plugin: 'io.ratpack.ratpack-groovy'
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: "migrations"
+apply plugin: "nebula.os-package"
+apply plugin: 'io.ratpack.ratpack-groovy'
 
 group = 'com.softwhistle'
 version = '1.0.0-SNAPSHOT'
@@ -28,13 +30,24 @@ repositories {
 
 install {
     repositories.mavenInstaller {
-        pom.artifactId = 'yomama'
+        pom.artifactId = 'finances'
     }
 }
 
 compileJava {
     if (System.getProperty("compilerWarnings") != null) {
         options.compilerArgs = ['-Xlint:unchecked']
+    }
+}
+
+buildRpm {
+    packageName = 'softwhistle-finances-management-webservice'
+    version = project.version.replaceAll('-SNAPSHOT', '')
+    createDirectoryEntry = true
+    
+    into '/opt/softwhistle/finances-webservice'
+    from(new File(project.buildDir, 'classes/main')) {
+        into ('classes')
     }
 }
 
