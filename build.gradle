@@ -71,7 +71,7 @@ migrations {
 
 buildRpm {
     packageName = 'softwhistle-finances-management-webservice'
-    version = project.version.replaceAll('\-SNAPSHOT', '')
+    version = project.version.replaceAll('\\-SNAPSHOT', '')
     os = 'LINUX'
     arch = 'noarch'
     createDirectoryEntry = true
