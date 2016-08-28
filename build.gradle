@@ -77,11 +77,14 @@ buildRpm {
     arch = 'noarch'
     createDirectoryEntry = true
     
-    into '/opt/softwhistle/finances-webservice'
+    def baseInstall = '/opt/softwhistle/finances-webservice'
+    into baseInstall
     from(new File(project.buildDir, 'classes/main')) {
-        into ('classes')
+        into('classes')
     }
-    from(new File(project.buildDir, 'resources/deploy/etc/init.d')) {
-        into ("/etc/init.d/$packageName")
+    from(new File(project.buildDir, 'resources/deploy/etc')) {
+        createDirectoryEntry
+        into('bin/etc')
     }
+    link("/etc/init.d/$packageName", "$baseInstall/bin/etc/init.d")
 }
