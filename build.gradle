@@ -72,6 +72,7 @@ migrations {
 buildRpm {
     packageName = 'softwhistle-finances-management-webservice'
     version = project.version.replaceAll('\\-SNAPSHOT', '')
+    release 1
     os = 'LINUX'
     arch = 'noarch'
     createDirectoryEntry = true
@@ -80,7 +81,7 @@ buildRpm {
     from(new File(project.buildDir, 'classes/main')) {
         into ('classes')
     }
-    from(new File(project.buildDir, 'resources/deploy/etc')) {
+    from(new File(project.buildDir, 'resources/deploy/etc/init.d')) {
         into ("/etc/init.d/$packageName")
     }
 }
