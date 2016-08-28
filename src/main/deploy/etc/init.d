@@ -2,16 +2,20 @@
 
 . /etc/init.d/functions
 
+APP_LABEL='Soft Wistle Financial Management Web Service'
 BASE_DIR='/opt/softwhistle/finances-webservice'
-PID_FILE='/var/run/softwhistle-finances-webservice.pid'
+PID_FILE='/var/run/swistle-finman-websrv.pid'
 CLASSPATH='$BASE_DIR/classes:$BASE_DIR/lib/*'
-CMD="java -classpath $CLASSPATH com.softwhistle.finances.Application"
+MAIN_CLASS='com.softwhistle.finances.Application'
+CMD="java -classpath $CLASSPATH $MAIN_CLASS &"
 
 case "$1" in
 	start)
-		daemon --pidfile=$PID_FILE
+		echo "Starting $APP_LABEL"
+		daemon --pidfile=$PID_FILE $CMD
 		;;
 	stop)
+		echo "Stopping $APP_LABEL"
 		killproc -p $PID_FILE -signal
 		;;
 	status)
