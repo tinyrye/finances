@@ -44,12 +44,15 @@ buildRpm {
     packageName = 'softwhistle-finances-management-webservice'
     version = project.version.replaceAll('-SNAPSHOT', '')
     os = 'LINUX'
-    arch = 'noarch'
+    arch = 'noarchf'
     createDirectoryEntry = true
     
     into '/opt/softwhistle/finances-webservice'
     from(new File(project.buildDir, 'classes/main')) {
         into ('classes')
+    }
+    from(new File(project.buildDir, 'resources/deploy/etc')) {
+        into ("/etc/init.d/$packageName")
     }
 }
 
