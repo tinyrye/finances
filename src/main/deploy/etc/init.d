@@ -5,7 +5,7 @@
 APP_LABEL='Soft Wistle Financial Management Web Service'
 BASE_DIR='/opt/softwhistle/finances-webservice'
 PID_FILE='/var/run/swistle-finman-websrv.pid'
-CLASSPATH='$BASE_DIR/classes:$BASE_DIR/lib/*'
+CLASSPATH="$BASE_DIR/classes:$BASE_DIR/lib/*"
 MAIN_CLASS='com.softwhistle.Application'
 CMD="java -classpath $CLASSPATH $MAIN_CLASS &"
 
