@@ -56,6 +56,12 @@ buildRpm {
     }
 }
 
+processResources {
+    from(new File(project.projectDir, 'src/main/deploy')) {
+        into ('../deploy')
+    }
+}
+
 dependencies {
     compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.1.1'
     compile group: 'com.softwhistle', name: 'jdbc-operations', version: '1.0.0-SNAPSHOT'
