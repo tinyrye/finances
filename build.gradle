@@ -46,11 +46,14 @@ task copyDependencies(type: Copy) {
     from configurations.runtime
 }
 
-processResources {
-    from(new File(project.rootDir, 'src/deploy')) {
-        into '../deploy'
+task copyDeploy(type: Copy) {
+    into project.buildDir
+    from(file('src/deploy')) {
+        into 'resources/deploy'
     }
 }
+
+processResources.dependsOn copyDeploy
 
 dependencies {
     compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.1.1'
@@ -94,6 +97,9 @@ buildRpm
         into('libs')
     }
     from(new File(project.buildDir, 'classes/main')) {
+        into('classes')
+    }
+    from(new File(project.buildDir, 'resources/main')) {
         into('classes')
     }
     from(new File(project.buildDir, 'resources/deploy/etc')) {

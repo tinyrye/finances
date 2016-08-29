@@ -16,7 +16,7 @@ case "$1" in
 		;;
 	stop)
 		echo "Stopping $APP_LABEL"
-		killproc -p $PID_FILE -signal
+		killproc --pidfile=$PID_FILE -signal
 		;;
 	status)
 		checkpid $(cat $PID_FILE)
