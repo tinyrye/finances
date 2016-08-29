@@ -139,7 +139,7 @@ public class Application implements Runnable
     
     protected DataSource primaryDataSource() {
         BasicDataSource primaryDataSource = new BasicDataSource();
-        primaryDataSource.setUrl("jdbc:postgresql://localhost:5433/finances");
+        primaryDataSource.setUrl("jdbc:postgresql://whistletown.civoso4i1xz9.us-west-2.rds.amazonaws.com:5432/finances");
         primaryDataSource.setUsername("professorfalkin");
         primaryDataSource.setPassword("joshua");
         primaryDataSource.setDriverClassName("org.postgresql.Driver");

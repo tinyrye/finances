@@ -15,18 +15,16 @@ function pid {
 }
 
 function check_running {
-    PID=$(pid $PID_FILE)
+    PID=$(pid)
     if [ "$PID" != "" ]; then
-        running=$(ps aux | awk '{ print $2 }' | grep $PID)
-        if [ "$running" != "" ]; then
-            return 1
-        fi
+        echo $(ps aux | awk '{ print $2 }' | grep $PID)
+    else
+        echo ""
     fi
-    return 0
 }
 
 function start {
-    if [ check_running != 0 ]; then
+    if [ "$(check_running)" != "" ]; then
         echo "Process has already started with PID, $(pid)"
     else
         echo "Starting $APP_LABEL"
@@ -36,14 +34,16 @@ function start {
 }
 
 function stop {
-    echo "Stopping $APP_LABEL"
-    if [ check_running != 0 ]; then
+    if [ "$(check_running)" != "" ]; then
+        echo "Stopping $APP_LABEL"
         kill $(pid)
+    else
+        echo "Process is not running."
     fi
 }
 
 function report_status {
-    if [ check_running != 0 ]; then
+    if [ "$(check_running)" != "" ]; then
         echo "Process is running with PID, $(pid)"
     else
         echo "Process is not running"
@@ -51,15 +51,15 @@ function report_status {
 }
 
 case "$1" in
-	start)
-		start
+    start)
+        start
         ;;
-	stop)
-		stop
-		;;
-	status)
-		report_status
-		;;
+    stop)
+        stop
+        ;;
+    status)
+        report_status
+        ;;
     *)
         echo "Invalid command: start|stop|status"
         ;;
