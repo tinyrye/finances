@@ -98,7 +98,6 @@ buildRpm
     }
     from(new File(project.buildDir, 'resources/deploy/etc')) {
         into('bin/etc')
-        //createDirectoryEntry
     }
     
     link("/etc/init.d/$packageName", "$baseInstall/bin/etc/init.d")
