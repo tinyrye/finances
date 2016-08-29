@@ -12,7 +12,8 @@ CMD="java -classpath $CLASSPATH $MAIN_CLASS"
 case "$1" in
 	start)
 		echo "Starting $APP_LABEL"
-		daemon --user=root --pidfile=$PID_FILE "$CMD &"
+		daemon --pidfile=$PID_FILE "$CMD &"
+		echo $? > $PID_FILE
 		;;
 	stop)
 		echo "Stopping $APP_LABEL"
