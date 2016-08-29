@@ -93,6 +93,8 @@ buildRpm
     
     into baseInstall
 
+    file('/var/log/softwhistle').mkdirs()
+
     from(new File(project.buildDir, 'distributions/dependencies/libs')) {
         into('libs')
     }
