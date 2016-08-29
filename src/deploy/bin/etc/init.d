@@ -12,11 +12,11 @@ CMD="java -classpath $CLASSPATH $MAIN_CLASS"
 case "$1" in
 	start)
 		echo "Starting $APP_LABEL"
-		daemon --pidfile=$PID_FILE "$CMD &"
+		daemon --user=root --pidfile=$PID_FILE "$CMD &"
 		;;
 	stop)
 		echo "Stopping $APP_LABEL"
-		killproc --pidfile=$PID_FILE -signal
+		killproc -p $PID_FILE -signal
 		;;
 	status)
 		checkpid $(cat $PID_FILE)

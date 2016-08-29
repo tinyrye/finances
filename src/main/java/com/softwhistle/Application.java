@@ -5,6 +5,7 @@ import static com.softwhistle.util.Values.notBlankOpt;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
@@ -81,7 +82,7 @@ public class Application implements Runnable
                 })
                 .with(jsonObjectSerdeRegistryAction)
             )
-            .serverConfig(config -> config.port(8088))
+            .serverConfig(config -> config.port(new Integer(System.getProperty("server.port", ResourceBundle.getBundle("defaults").getString("server.port")))))
             .handlers(chain -> chain
                 .prefix("account/:id?:\\d+", subChain -> subChain
                     .all(entityIdRegistrar(Account.class))

@@ -104,8 +104,8 @@ buildRpm
     from(new File(project.buildDir, 'resources/main')) {
         into('classes')
     }
-    from(new File(project.buildDir, 'resources/deploy/etc')) {
-        into('bin/etc')
+    from(new File(project.buildDir, 'resources/deploy/bin')) {
+        into('bin')
     }
     
     link("/etc/init.d/$packageName", "$baseInstall/bin/etc/init.d")
