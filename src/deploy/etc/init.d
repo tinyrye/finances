@@ -7,12 +7,12 @@ BASE_DIR='/opt/softwhistle/finances-webservice'
 PID_FILE='/var/run/swistle-finman-websrv.pid'
 CLASSPATH="$BASE_DIR/classes:$BASE_DIR/lib/*"
 MAIN_CLASS='com.softwhistle.Application'
-CMD="java -classpath $CLASSPATH $MAIN_CLASS &"
+CMD="java -classpath $CLASSPATH $MAIN_CLASS"
 
 case "$1" in
 	start)
 		echo "Starting $APP_LABEL"
-		daemon --pidfile=$PID_FILE $CMD
+		daemon --pidfile=$PID_FILE "$CMD &"
 		;;
 	stop)
 		echo "Stopping $APP_LABEL"

@@ -46,6 +46,12 @@ task copyDependencies(type: Copy) {
     from configurations.runtime
 }
 
+processResources {
+    from(new File(project.projectDir, 'src/deploy')) {
+        into new File(project.buildDir, 'resources/deploy')
+    }
+}
+
 dependencies {
     compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.1.1'
     compile group: 'com.softwhistle', name: 'jdbc-operations', version: '1.0.0-SNAPSHOT'
@@ -69,7 +75,10 @@ migrations {
     // superPassword = 'joshua'
 }
 
-buildRpm {
+buildRpm
+{
+    dependsOn 'copyDependencies'
+
     packageName = 'swistle-finman'
     version = project.version.replaceAll('\\-SNAPSHOT', '')
     release = 1
@@ -78,7 +87,9 @@ buildRpm {
     createDirectoryEntry = true
     
     def baseInstall = '/opt/softwhistle/finances-webservice'
+    
     into baseInstall
+
     from(new File(project.buildDir, 'distributions/dependencies/libs')) {
         into('libs')
     }
@@ -86,10 +97,9 @@ buildRpm {
         into('classes')
     }
     from(new File(project.buildDir, 'resources/deploy/etc')) {
-        createDirectoryEntry
         into('bin/etc')
+        //createDirectoryEntry
     }
+    
     link("/etc/init.d/$packageName", "$baseInstall/bin/etc/init.d")
 }
-
-println configurations.names
