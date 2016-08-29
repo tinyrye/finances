@@ -47,8 +47,8 @@ task copyDependencies(type: Copy) {
 }
 
 processResources {
-    from(new File(project.projectDir, 'src/deploy')) {
-        into new File(project.buildDir, 'resources/deploy')
+    from(new File(project.rootDir, 'src/deploy')) {
+        into '../deploy'
     }
 }
 
