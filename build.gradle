@@ -66,12 +66,12 @@ dependencies {
 }
 
 migrations {
-    superUrl = 'jdbc:postgresql://whistletown.civoso4i1xz9.us-west-2.rds.amazonaws.com:5432/postgres'
-    url = 'jdbc:postgresql://whistletown.civoso4i1xz9.us-west-2.rds.amazonaws.com:5432/finances'
+    superUrl = 'jdbc:postgresql://whistletoon.civoso4i1xz9.us-west-2.rds.amazonaws.com:5432/postgres'
+    url = 'jdbc:postgresql://whistletoon.civoso4i1xz9.us-west-2.rds.amazonaws.com:5432/finances'
     database = 'finances'
     driverClassName = 'org.postgresql.Driver'
     username = 'professorfalkin'
-    password = 'joshua'
+    password = 'hellojoshua'
     baseDir = 'src/main/database/migrations'
     // if normal user is not superuser capable of creating/dropping databases
     // superUsername = 'professorfalkin'
