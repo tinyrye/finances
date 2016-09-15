@@ -82,7 +82,6 @@ CREATE TABLE budget_item
 );
 
 CREATE INDEX budget_item_byBudget ON budget_item(budget_id);
-CREATE INDEX budget_item_byItemType ON budget_item(item_type);
 CREATE INDEX budget_item_byCategorization ON budget_item(budget_item_categorization_id);
 CREATE INDEX budget_item_byAmount ON budget_item(amount);
 CREATE INDEX budget_item_byOccurrence ON budget_item(budget_occurrence_schedule_id);
