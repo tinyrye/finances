@@ -28,9 +28,12 @@ public class ActiveBudgetHandler implements Handler
         try { exchange.byMethod(methodSpec -> methodSpec
                 .get(() -> renderObject(exchange, managerFor(exchange)
                     .loadActiveBudget().loadInFull()
-                    .requireBudget((manager) -> new EntityNotFoundException(
-                        new EntityId().id(manager.getHolder().id).entityType(AccountHolder.class),
-                        Budget.class))))
+                    .requireBudget((manager) ->
+                        new EntityNotFoundException(new EntityId()
+                                .id(manager.getHolder().id)
+                                .entityType(AccountHolder.class),
+                            Budget.class
+                        ))))
                 .post(() -> requestObject(exchange, Budget.class).then(budget -> {
                     LOG.info("Requested Budget to Set to Active: {}", budget);
                     renderObject(exchange, managerFor(exchange)

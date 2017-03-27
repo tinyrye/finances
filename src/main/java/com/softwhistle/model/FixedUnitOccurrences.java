@@ -75,14 +75,7 @@ public class FixedUnitOccurrences implements OccurrenceSchedule
         else if (that instanceof FixedUnitOccurrences) return equals((FixedUnitOccurrences) that);
         else return false;
     }
-    
-    @Override
-    public String toString() {
-        return new ObjectPrinter().printProperties("FixedUnitOccurrences", builder -> builder
-            .add("id", id).add("startsAt", startsAt).add("endsAt", endsAt)
-            .add("magnitude", magnitude).add("unit", unit));
-    }
-
+ 
     public boolean equals(FixedUnitOccurrences that) {
         return Objects.equals(this.startsAt, that.startsAt)
             && Objects.equals(this.endsAt, that.endsAt)

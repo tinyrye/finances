@@ -6,7 +6,7 @@ appender('FILE', RollingFileAppender) {
 	}
 	rollingPolicy (FixedWindowRollingPolicy) {
 		maxIndex = 5
-		fileNamePattern = 'finances-webservice.log-%i.gz'
+		fileNamePattern = '/var/log/softwhistle/finances-webservice.log-%i.gz'
 	}
 	triggeringPolicy(SizeBasedTriggeringPolicy) {
         maxFileSize = '512MB'

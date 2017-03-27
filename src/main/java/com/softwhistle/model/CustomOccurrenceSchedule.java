@@ -33,14 +33,6 @@ public class CustomOccurrenceSchedule implements OccurrenceSchedule
     public Iterator<OffsetDateTime> occurrences(OffsetDateTime from, OffsetDateTime to) {
         return occurrences.iterator();
     }
-        
-    @Override
-    public String toString() {
-        Map<String,Object> properties = new HashMap<String,Object>();
-        properties.put("id", id);
-        properties.put("occurrences", occurrences);
-        return new ObjectPrinter().printProperties("customOccurrenceSchedule", properties);
-    }
 
     @Override
     public boolean equals(Object that) {

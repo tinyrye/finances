@@ -1,10 +1,7 @@
-package com.softwhistle.model;
+package com.softwhistle.util;
 
 import java.util.Map;
 import java.util.function.Consumer;
-
-import com.softwhistle.util.MapPrintJoiner;
-import com.softwhistle.util.MapAppender;
 
 public class ObjectPrinter
 {

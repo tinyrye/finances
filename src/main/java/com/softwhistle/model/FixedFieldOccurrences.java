@@ -74,17 +74,6 @@ public class FixedFieldOccurrences implements OccurrenceSchedule
         else if (that instanceof FixedFieldOccurrences) return equals((FixedFieldOccurrences) that);
         else return false;
     }
-    
-    @Override
-    public String toString() {
-        Map<String,Object> properties = new HashMap<String,Object>();
-        properties.put("id", id);
-        properties.put("startsAt", startsAt);
-        properties.put("endsAt", endsAt);
-        properties.put("magnitude", magnitude);
-        properties.put("field", field);
-        return new ObjectPrinter().printProperties("FixedFieldOccurrences", properties);
-    }
 
     public boolean equals(FixedFieldOccurrences that) {
         return Objects.equals(this.startsAt, that.startsAt)

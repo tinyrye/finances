@@ -3,20 +3,25 @@ buildscript {
         mavenLocal()
         mavenCentral()
         jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath 'io.ratpack:ratpack-gradle:0.9.19'
-        classpath "com.netflix.nebula:gradle-ospackage-plugin:2.2.6"
         classpath "com.softwhistle:database-migrations-gradle-plugin:1.0.0-SNAPSHOT"
         classpath 'org.postgresql:postgresql:9.4.1209'
+        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.3"
     }
 }
+
+import com.tinyrye.gradle.database.DatabaseDropTask
+import com.tinyrye.gradle.database.DatabaseInitializeTask
+import com.tinyrye.gradle.database.DatabaseMigrateTask
 
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: "migrations"
-apply plugin: "nebula.os-package"
 apply plugin: 'io.ratpack.ratpack-groovy'
+apply plugin: 'distribution'
 
 group = 'com.softwhistle'
 version = '1.0.0-SNAPSHOT'
@@ -26,6 +31,11 @@ repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
+}
+
+jar {
+    baseName = 'finances'
+    version = '1.0.0-SNAPSHOT'
 }
 
 install {
@@ -57,56 +67,58 @@ processResources.dependsOn copyDeploy
 
 dependencies {
     compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.1.1'
+    compile group: 'com.softwhistle', name: 'io-operations', version: '1.0.0-SNAPSHOT'
     compile group: 'com.softwhistle', name: 'jdbc-operations', version: '1.0.0-SNAPSHOT'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.12'
+    compile group: 'com.typesafe', name: 'config', version: '1.3.1'
     compile group: 'ch.qos.logback', name: 'logback-core', version: '1.1.3'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.3'
-    runtime group: 'org.postgresql', name: 'postgresql', version: '9.4.1209'
+    compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1209'
+    testCompile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
     testCompile group: 'junit', name: 'junit', version: '4.8.2'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
+    testCompile group: 'commons-io', name: 'commons-io', version: '2.5'
 }
 
 migrations {
-    superUrl = 'jdbc:postgresql://whistletoon.civoso4i1xz9.us-west-2.rds.amazonaws.com:5432/postgres'
-    url = 'jdbc:postgresql://whistletoon.civoso4i1xz9.us-west-2.rds.amazonaws.com:5432/finances'
+    superConfig {
+        url = 'jdbc:postgresql://localhost:5432/postgres'
+        username = 'professorfalken'
+        password = 'joshua'
+    }
+    url = 'jdbc:postgresql://localhost:5432/finances'
     database = 'finances'
     driverClassName = 'org.postgresql.Driver'
-    username = 'professorfalkin'
-    password = 'hellojoshua'
-    baseDir = 'src/main/database/migrations'
-    // if normal user is not superuser capable of creating/dropping databases
-    // superUsername = 'professorfalkin'
-    // superPassword = 'joshua'
+    username = 'professorfalken'
+    password = 'joshua'
+    baseDir = new File('src/main/database/migrations')
 }
 
-buildRpm
-{
-    dependsOn 'copyDependencies'
-
-    packageName = 'swistle-finman'
-    version = project.version.replaceAll('\\-SNAPSHOT', '')
-    release = 1
-    os = 'LINUX'
-    arch = 'noarch'
-    createDirectoryEntry = true
-    
-    def baseInstall = '/opt/softwhistle/finances-webservice'
-    
-    into baseInstall
-
-    directory('/var/log/softwhistle')
-
-    from(new File(project.buildDir, 'distributions/dependencies/libs')) {
-        into('libs')
-    }
-    from(new File(project.buildDir, 'classes/main')) {
-        into('classes')
-    }
-    from(new File(project.buildDir, 'resources/main')) {
-        into('classes')
-    }
-    from(new File(project.buildDir, 'resources/deploy/bin')) {
-        into('bin')
-    }
-    
-    link("/etc/init.d/$packageName", "$baseInstall/bin/etc/init.d")
+task testDatabaseDrop(type: DatabaseDropTask) {
+    database = 'finances_test'
+    driverClassName = 'org.postgresql.Driver'
+    superUrl = 'jdbc:postgresql://localhost:5432/postgres'
+    superUsername = 'professorfalken'
+    superPassword = 'joshua'
 }
+
+task testDatabaseInitialize(type: DatabaseInitializeTask) {
+    url = 'jdbc:postgresql://localhost:5432/finances_test'
+    database = 'finances_test'
+    driverClassName = 'org.postgresql.Driver'
+    username = 'professorfalken'
+    password = 'joshua'
+    superUrl = 'jdbc:postgresql://localhost:5432/postgres'
+    superUsername = 'professorfalken'
+    superPassword = 'joshua'
+}
+
+task testDatabaseMigrate(type: DatabaseMigrateTask) {
+    url = 'jdbc:postgresql://localhost:5432/finances_test'
+    driverClassName = 'org.postgresql.Driver'
+    username = 'professorfalken'
+    password = 'joshua'
+    migrationsBaseDir = new File('src/main/database/migrations')
+}
+
+test.dependsOn testDatabaseMigrate

@@ -44,14 +44,6 @@ public class Budget implements Serializable
         else if (that instanceof Budget) return equals((Budget) that);
         else return false;
     }
-
-    @Override
-    public String toString() {
-        return new ObjectPrinter().printProperties("Budget", builder -> builder
-            .add("id", id).add("name", name).add("active", active)
-            .add("holder", holder).add("startsAt", startsAt)
-            .add("endsAt", endsAt).add("items", items));
-    }
     
     public boolean equals(Budget that) {
         return Objects.equals(this.id, that.id)

@@ -3,6 +3,7 @@ CREATE TABLE budget
     id SERIAL PRIMARY KEY,
     name VARCHAR(128),
     account_holder_id INTEGER REFERENCES account_holder(id),
+    base_account_id INTEGER REFERENCES account(id),
     active BOOLEAN,
     starts_at TIMESTAMP,
     ends_at TIMESTAMP,

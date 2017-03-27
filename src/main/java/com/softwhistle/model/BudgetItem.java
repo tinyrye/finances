@@ -13,8 +13,8 @@ public class BudgetItem implements Serializable
     public String description;
     public OccurrenceSchedule transactsOn;
     public Account holderAccount;
-    public Account merchantAccount;
     public String merchant;
+    public Account merchantAccount;
     
     public BudgetItem id(Integer id) { this.id = id; return this; }
     public BudgetItem categorization(List<String> categorization) { this.categorization = categorization; return this; }
@@ -22,6 +22,6 @@ public class BudgetItem implements Serializable
     public BudgetItem description(String description) { this.description = description; return this; }
     public BudgetItem transactsOn(OccurrenceSchedule transactsOn) { this.transactsOn = transactsOn; return this; }
     public BudgetItem holderAccount(Account holderAccount) { this.holderAccount = holderAccount; return this; }
-    public BudgetItem merchantAccount(Account merchantAccount) { this.merchantAccount = merchantAccount; return this; }
     public BudgetItem merchant(String merchant) { this.merchant = merchant; return this; }
+    public BudgetItem merchantAccount(Account merchantAccount) { this.merchantAccount = merchantAccount; return this; }
 }

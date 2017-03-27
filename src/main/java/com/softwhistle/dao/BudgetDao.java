@@ -70,21 +70,21 @@ public class BudgetDao
         new Budget().id(valueUtility.convert(resultSet, Integer.class, "id"))
             .active(valueUtility.convert(resultSet, Boolean.class, "active"))
             .name(valueUtility.convert(resultSet, String.class, "name"));
-    
+
     private final RowConverter<FixedUnitOccurrences> baseFixedUnitOccurrencesConverter = (resultSet, valueUtility) ->
         new FixedUnitOccurrences().id(valueUtility.convert(resultSet, Integer.class, "id"))
             .startsAt(valueUtility.convert(resultSet, OffsetDateTime.class, "startsAt"))
             .endsAt(valueUtility.convert(resultSet, OffsetDateTime.class, "endsAt"))
             .magnitude(valueUtility.convert(resultSet, Integer.class, "magnitude"))
             .unit(valueUtility.convert(resultSet, ChronoUnit.class, "unit"));
-    
+
     private final RowConverter<FixedFieldOccurrences> baseFixedFieldOccurrencesConverter = (resultSet, valueUtility) ->
         new FixedFieldOccurrences().id(valueUtility.convert(resultSet, Integer.class, "id"))
             .startsAt(valueUtility.convert(resultSet, OffsetDateTime.class, "startsAt"))
             .endsAt(valueUtility.convert(resultSet, OffsetDateTime.class, "endsAt"))
             .magnitude(valueUtility.convert(resultSet, Integer.class, "magnitude"))
             .field(valueUtility.convert(resultSet, ChronoField.class, "field"));    
-    
+
     public BudgetDao(DataSource datasource)
     {
         this.datasource = datasource;
@@ -102,10 +102,10 @@ public class BudgetDao
         
         fixedUnitOccurrencesInsert = new SQLInsert(datasource)
             .sql("INSERT INTO budget_fixed_unit_occurrences (budget_occurrence_schedule_id, starts_at, ends_at, magnitude, unit) VALUES (?, ?, ?, ?, ?)");
-        
+
         fixedFieldOccurrencesInsert = new SQLInsert(datasource)
             .sql("INSERT INTO budget_fixed_field_occurrences (budget_occurrence_schedule_id, starts_at, ends_at, magnitude, field) VALUES (?, ?, ?, ?, ?)");
-        
+
         customScheduleOccurrenceInsert = new SQLInsert(datasource)
             .sql("INSERT INTO budget_custom_occurrences (budget_occurrence_schedule_id, occurs_at) VALUES (?, ?)");
         
@@ -117,7 +117,7 @@ public class BudgetDao
 
         budgetByHolderAndNameSelect = new SQLQuery(datasource)
             .sql(new DaoStatementLocator(BudgetDao.class, "budgetByHolderAndNameSelect"));
-        
+
         occurrenceScheduleTypeByIdSelect = new SQLQuery(datasource)
             .sql(new DaoStatementLocator(BudgetDao.class, "occurrenceScheduleTypeByIdSelect"));
         
@@ -130,10 +130,10 @@ public class BudgetDao
             .sql(new DaoStatementLocator(BudgetDao.class, "fixedFieldOccurrencesByIdSelect"));
         
         customOccurrenceScheduleByIdSelect = new SQLQuery(datasource)
-            .sql(new DaoStatementLocator(BudgetDao.class, "customOccurrenceScheduleByIdSelect"));
+            .sql(new DaoStatementLocator(BudgetDao.class, "customOccurrencesByIdSelect"));
         
         customOccurrenceSchedulesByIdsSelect = new SQLQuery(datasource)
-            .sql(new DaoStatementLocator(BudgetDao.class, "customOccurrenceSchedulesByIdsSelect"));
+            .sql(new DaoStatementLocator(BudgetDao.class, "customOccurrencesByIdsSelect"));
         
         fixedUnitOccurrencesSelectStmt = new DaoStatementLocator(BudgetDao.class, "fixedUnitOccurrencesSelect");
         fixedFieldOccurrencesSelectStmt = new DaoStatementLocator(BudgetDao.class, "fixedFieldOccurrencesSelect");
@@ -335,35 +335,38 @@ public class BudgetDao
         return byIds;
     }
     
-    protected Optional<Integer> insertBase(OccurrenceSchedule occurrence) {
-        return occurrenceScheduleInsert.call(() -> asList(occurrence.getClass().getName()))
+    protected Optional<Integer> insertBase(OccurrenceSchedule occurrenceSchedule) {
+        return occurrenceScheduleInsert.call(() -> asList(occurrenceSchedule.getClass().getName()))
             .firstRowKey();
     }
     
-    public void insert(FixedUnitOccurrences occurrence) {
-        insertBase(occurrence).ifPresent(key -> {
-            occurrence.id = key;
+    public void insert(FixedUnitOccurrences occurrenceSchedule) {
+        insertBase(occurrenceSchedule).ifPresent(key -> {
+            occurrenceSchedule.id = key;
             fixedUnitOccurrencesInsert.call(
-                () -> asList(occurrence.id, occurrence.startsAt, occurrence.endsAt,
-                    occurrence.magnitude, occurrence.unit));
+                () -> asList(occurrenceSchedule.id, occurrenceSchedule.startsAt, occurrenceSchedule.endsAt,
+                    occurrenceSchedule.magnitude, occurrenceSchedule.unit));
         });
     }
 
-    public void insert(FixedFieldOccurrences occurrence) {
-        insertBase(occurrence).ifPresent(key -> {
-            occurrence.id = key;
+    public void insert(FixedFieldOccurrences occurrenceSchedule) {
+        insertBase(occurrenceSchedule).ifPresent(key -> {
+            occurrenceSchedule.id = key;
             fixedFieldOccurrencesInsert.call(
-                () -> asList(occurrence.id, occurrence.startsAt, occurrence.endsAt,
-                    occurrence.magnitude, occurrence.field));
+                () -> asList(occurrenceSchedule.id, occurrenceSchedule.startsAt, occurrenceSchedule.endsAt,
+                    occurrenceSchedule.magnitude, occurrenceSchedule.field));
         });
     }
     
-    public void insert(CustomOccurrenceSchedule occurrence) {
-        insertBase(occurrence).ifPresent(key -> {
-            occurrence.id = key;
-            occurrence.occurrences.forEach(occurence -> customScheduleOccurrenceInsert.call(
-                () -> asList(occurrence.id, occurrence))
-            );
+    public void insert(CustomOccurrenceSchedule occurrenceSchedule) {
+        insertBase(occurrenceSchedule).ifPresent(key -> {
+            occurrenceSchedule.id = key;
+            occurrenceSchedule.occurrences.forEach(occurrence -> {
+                System.out.println(
+                    String.format("Inserting occurrence in schedule: scheduleId=%s; occurrence=%s", 
+                        occurrenceSchedule.id, occurrence));
+                customScheduleOccurrenceInsert.call(() -> asList(occurrenceSchedule.id, occurrence));
+            });
         });
     }
 

@@ -11,6 +11,8 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
+import com.softwhistle.util.DateTimeParses;
+
 public class DateTimeJsonDeserializer extends JsonDeserializer<OffsetDateTime>
 {
     public OffsetDateTime deserialize(JsonParser parser, DeserializationContext objectParseContext)
@@ -18,12 +20,12 @@ public class DateTimeJsonDeserializer extends JsonDeserializer<OffsetDateTime>
     {
         return deserialize(parser);
     }
-    
+
     public OffsetDateTime deserialize(JsonParser parser)
         throws IOException, JsonProcessingException
     {
         if (parser.getCurrentToken() == JsonToken.VALUE_STRING) {
-            return OffsetDateTime.parse(parser.getText(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            return DateTimeParses.parseFlexibleOffsetDateTime(parser.getText());
         }
         else if (parser.getCurrentToken() == JsonToken.VALUE_NUMBER_INT) {
             return OffsetDateTime.from(Instant.ofEpochMilli(parser.getLongValue()));

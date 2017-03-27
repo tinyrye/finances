@@ -13,6 +13,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigBeanFactory;
+import com.typesafe.config.ConfigFactory;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import org.slf4j.Logger;
@@ -38,6 +42,7 @@ public class Application implements Runnable
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
     
     private RatpackServer server;
+    private Config config;
 
     public static void main(String[] args) throws Exception {
         new Application().run();
@@ -112,9 +117,9 @@ public class Application implements Runnable
     
     public static ObjectMapper jsonObjectSerde() {
         return new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .registerModule(new SimpleModule() .addDeserializer(OccurrenceSchedule.class,
+            .registerModule(new SimpleModule().addDeserializer(OccurrenceSchedule.class,
                 WrappedInheritableJsonDeserializer.instanceForEntity(
-                OccurrenceSchedule.class)));
+                    OccurrenceSchedule.class)));
     }
     
     protected Action<? super RegistrySpec> jsonObjectSerdeRegistryAction = (registrySpec) -> {
@@ -136,16 +141,11 @@ public class Application implements Runnable
             exchange.next();
         };
     }
-    
+
     protected DataSource primaryDataSource() {
-        BasicDataSource primaryDataSource = new BasicDataSource();
-        primaryDataSource.setUrl("jdbc:postgresql://whistletown.civoso4i1xz9.us-west-2.rds.amazonaws.com:5432/finances");
-        primaryDataSource.setUsername("professorfalkin");
-        primaryDataSource.setPassword("joshua");
-        primaryDataSource.setDriverClassName("org.postgresql.Driver");
-        return primaryDataSource;
+        return ConfigBeanFactory.create(config.getConfig("datasource"), BasicDataSource.class);
     }
-    
+
     protected class ServiceExchangeImpl implements ServiceExchange
     {
         private Map<Class,Object> services = new HashMap<Class,Object>();

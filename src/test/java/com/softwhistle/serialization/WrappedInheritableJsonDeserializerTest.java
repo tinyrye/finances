@@ -1,12 +1,14 @@
 package com.softwhistle.serialization;
 
+import static java.util.Arrays.asList;
+import static com.softwhistle.util.DateTimeParses.parseFlexibleOffsetDateTime;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -38,19 +40,22 @@ public class WrappedInheritableJsonDeserializerTest
         public OccurrenceSchedule occurrence;
     }
 
-    private static final CustomOccurrenceSchedule EXPECTED_CUSTOM_SCHEDULE = new CustomOccurrenceSchedule();
-    static {
-        try {
-            EXPECTED_CUSTOM_SCHEDULE
-                .addOccurrence(OffsetDateTime.parse("2015-01-01T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-                .addOccurrence(OffsetDateTime.parse("2015-01-18T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-                .addOccurrence(OffsetDateTime.parse("2015-02-07T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-                .addOccurrence(OffsetDateTime.parse("2015-02-18T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-                .addOccurrence(OffsetDateTime.parse("2015-02-28T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-                .addOccurrence(OffsetDateTime.parse("2015-03-05T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        } catch (Throwable ex) { LOG.error("Whoops", ex); }
-    }
-    
+    private static final List<CustomOccurrenceSchedule> EXPECTED_CUSTOM_SCHEDULES = asList(
+        new CustomOccurrenceSchedule()
+            .addOccurrence(OffsetDateTime.parse("2015-01-01T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+            .addOccurrence(OffsetDateTime.parse("2015-01-18T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+            .addOccurrence(OffsetDateTime.parse("2015-02-07T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+            .addOccurrence(OffsetDateTime.parse("2015-02-18T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+            .addOccurrence(OffsetDateTime.parse("2015-02-28T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+            .addOccurrence(OffsetDateTime.parse("2015-03-05T00:00:00+00:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME)),
+        new CustomOccurrenceSchedule()
+            .addOccurrence(parseFlexibleOffsetDateTime("2017-01-09"))
+            .addOccurrence(OffsetDateTime.parse("2017-01-28T00:08:17+05:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+            .addOccurrence(OffsetDateTime.parse("2017-02-14T00:00:00Z", DateTimeFormatter.ISO_OFFSET_DATE_TIME)),
+        new CustomOccurrenceSchedule()
+            .addOccurrence(parseFlexibleOffsetDateTime("2017-02-19"))
+    );
+
     private int assertionCount = 0;
     private ObjectMapper jsonObjectMapper;
     
@@ -64,12 +69,12 @@ public class WrappedInheritableJsonDeserializerTest
                     OccurrenceSchedule.class)));
     }
 
-    @Test @Ignore
+    @Test
     public void testDeserializeFixedIntervalStrings() throws Exception
     {
         forBothEach(
             readTestEntitiesFromJson("fixedUnitString"),
-            Arrays.asList(
+            asList(
                 new FixedUnitOccurrences().unit(ChronoUnit.YEARS).magnitude(1),
                 new FixedUnitOccurrences().unit(ChronoUnit.YEARS).magnitude(3),
                 new FixedUnitOccurrences().unit(ChronoUnit.YEARS).magnitude(6),
@@ -95,7 +100,7 @@ public class WrappedInheritableJsonDeserializerTest
     {
         forBothEach(
             readTestEntitiesFromJson("fixedUnitObject"),
-            Arrays.asList(
+            asList(
                 new FixedUnitOccurrences().unit(ChronoUnit.YEARS).magnitude(1),
                 new FixedUnitOccurrences().unit(ChronoUnit.YEARS).magnitude(3),
                 new FixedUnitOccurrences().unit(ChronoUnit.YEARS).magnitude(6)
@@ -119,9 +124,13 @@ public class WrappedInheritableJsonDeserializerTest
         );
     }
     
-    @Test @Ignore
+    @Test
     public void testDeserializeCustomScheduleObject() throws Exception {
-        assertDeserialization(readTestEntityFromJson("customScheduleObject"), EXPECTED_CUSTOM_SCHEDULE);
+        forBothEach(
+            readTestEntitiesFromJson("customScheduleObject"),
+            EXPECTED_CUSTOM_SCHEDULES.iterator(),
+            (actualObject, expectedObject) -> assertDeserialization(actualObject, expectedObject)
+        );
     }
     
     protected void assertDeserialization(TestEntity actualObject, OccurrenceSchedule expectedOccurrenceSchedule)

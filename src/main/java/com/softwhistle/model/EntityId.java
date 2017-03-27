@@ -17,11 +17,4 @@ public class EntityId<T> implements Serializable
     
     public EntityId id(Integer id) { this.id = id; return this; }
     public EntityId entityType(Class<T> entityType) { this.entityType = entityType; return this; }
-
-    @Override
-    public String toString() {
-        return new ObjectPrinter()
-            .printProperties("EntityId", builder -> builder
-                .add("id", id).add("entityType", entityType));
-    }
 }

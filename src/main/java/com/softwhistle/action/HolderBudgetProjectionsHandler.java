@@ -4,8 +4,6 @@ import static com.softwhistle.util.JsonExchangeHelper.renderObject;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +21,7 @@ import ratpack.http.Response;
 
 import com.softwhistle.model.FixedFieldOccurrences;
 import com.softwhistle.service.HolderBudgetManager;
+import com.softwhistle.util.DateTimeParses;
 import com.softwhistle.util.Holder;
 import com.softwhistle.util.ParameterTransform;
 
@@ -52,15 +51,14 @@ public class HolderBudgetProjectionsHandler implements Handler
         }
     }
 
-    protected ParameterTransform<OffsetDateTime> dateTimeParamTransform = (requestValue, receiver) ->
-    {
+    protected ParameterTransform<OffsetDateTime> dateTimeParamTransform = (requestValue, receiver) -> {
         try {
-            receiver.accept(OffsetDateTime.parse(requestValue, DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+            receiver.accept(DateTimeParses.parseFlexibleOffsetDateTime(requestValue));
             return null;
         }
-        catch (DateTimeParseException ex) {
-            return String.format("Invalid date time string; accepted format(s): %s",
-                DateTimeFormatter.ISO_OFFSET_DATE_TIME.toString());
+        catch (Exception ex) {
+            LOG.error("Failed to parse date time param", ex);
+            return String.format("Invalid date time string; value: %s", requestValue);
         }
     };
     

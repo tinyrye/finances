@@ -15,7 +15,7 @@ import static ratpack.util.Types.listOf;
  * <code>
  *   public void handle(Context exchange) {
  *       Object serviceResult = ...; // perform service; this is the result of service
- *       renderObject(exchange, serviceResult);
+ *       renderObject(exchange, serviceResult); // this sends serviceResult as response body object through exchange
  *   }
  * </code>
  * 
