@@ -12,5 +12,5 @@ appender('FILE', RollingFileAppender) {
         maxFileSize = '512MB'
     }
 }
-logger('com.softwhistle', ALL, ['FILE'])
+logger('com.softwhistle', DEBUG, ['FILE'])
 root(INFO, ['FILE'])

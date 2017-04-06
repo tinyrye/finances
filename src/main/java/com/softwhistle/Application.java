@@ -3,6 +3,8 @@ package com.softwhistle;
 import static com.softwhistle.util.JsonExchangeHelper.renderObject;
 import static com.softwhistle.util.Values.notBlankOpt;
 
+import java.io.File;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -36,18 +38,27 @@ import com.softwhistle.dao.*;
 import com.softwhistle.model.*;
 import com.softwhistle.serialization.WrappedInheritableJsonDeserializer;
 import com.softwhistle.service.*;
+import com.softwhistle.util.JdbcDataSourceFactory;
 
 public class Application implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
-    
-    private RatpackServer server;
-    private Config config;
+    private static final Map<String,Object> DATASOURCE_DEFAULT_CONFIGS = new HashMap<String,Object>();
+    static {
+        DATASOURCE_DEFAULT_CONFIGS.put("driverClassName", "org.postgresql.Driver");
+    }
 
+    private RatpackServer server;
+    private Config configDatasourceFallbacks = ConfigFactory.parseMap(DATASOURCE_DEFAULT_CONFIGS);
+    private Config config = ConfigFactory.load();
+    
     public static void main(String[] args) throws Exception {
+        if (System.getProperty("config.file") == null) {
+            System.setProperty("config.file", new File("application.conf").getAbsolutePath());
+        }
         new Application().run();
     }
-    
+
     @Override
     public void run() {
         try { buildServer().start(); }
@@ -58,6 +69,7 @@ public class Application implements Runnable
     {
         return (server = RatpackServer.of(serverSpec -> serverSpec
             .registryOf(registrySpec -> registrySpec.add(new AccountHandler())
+                .add(new AccountHolderSearchHandler())
                 .add(new AccountHolderHandler())
                 .add(new AccountSummaryHandler())
                 .add(new ActiveBudgetHandler())
@@ -89,6 +101,7 @@ public class Application implements Runnable
             )
             .serverConfig(config -> config.port(new Integer(System.getProperty("server.port", ResourceBundle.getBundle("defaults").getString("server.port")))))
             .handlers(chain -> chain
+                .path("search/account/holder", AccountHolderSearchHandler.class)
                 .prefix("account/:id?:\\d+", subChain -> subChain
                     .all(entityIdRegistrar(Account.class))
                     .path(AccountHandler.class)
@@ -143,7 +156,7 @@ public class Application implements Runnable
     }
 
     protected DataSource primaryDataSource() {
-        return ConfigBeanFactory.create(config.getConfig("datasource"), BasicDataSource.class);
+        return JdbcDataSourceFactory.of("primary", config.getConfig("datasource").withFallback(configDatasourceFallbacks));
     }
 
     protected class ServiceExchangeImpl implements ServiceExchange

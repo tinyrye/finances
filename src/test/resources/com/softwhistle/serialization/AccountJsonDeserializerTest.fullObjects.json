@@ -1,0 +1,13 @@
+[{
+	"id": 999,
+	"holderCode": "BLUES_BROS",
+	"institutionAccountId": "123456-abcdef"
+},{
+	"id": 5734
+},{
+	"holderCode": "BLUES_BROS",
+	"institutionAccountId": "123456-abcdef",
+	"institutionAccountName": "Credit Union Checking Account"
+},{
+	"holderCode": "MY_PRIMARY_ACCOUNT"
+}]

@@ -28,9 +28,10 @@ public class AccountHandler implements Handler
         try { exchange.byMethod(methodSpec -> methodSpec
                 .get(() -> renderObject(exchange, managerForAccount(exchange).getAccount()))
                 .post(() -> requestObject(exchange, Account.class).then(account -> 
-                                renderObject(exchange, checkSetToPrimary(managerForHolder(
-                                    exchange, account.holder.id)
-                                        .create(account), exchange))))
+                                renderObject(exchange, checkSetToPrimary(
+                                    managerForHolder(exchange, account.holder.id)
+                                        .create(account),
+                                    exchange))))
         ); } catch (Exception ex) { throw new RuntimeException(ex); }
     }
     

@@ -12,10 +12,10 @@ import org.junit.Test;
 
 import com.softwhistle.model.FixedUnitOccurrences;
 
-public class FixedUnitOccurrencesJsonDeserializerTest
+public class FixedUnitOccurrencesJsonDeserializerTest extends SerializationTestSupport
 {
 	@Test
-	public void testDeserialize() throws Exception
+	public void testMockDeserialize() throws Exception
 	{
 		JsonParser mockParser = mock(JsonParser.class);
 		when(mockParser.getCurrentToken()).thenReturn(JsonToken.VALUE_STRING);

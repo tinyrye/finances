@@ -2,16 +2,22 @@ package com.softwhistle.service;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.softwhistle.dao.AccountsDao;
 import com.softwhistle.model.Account;
 import com.softwhistle.model.AccountHolder;
 import com.softwhistle.model.AccountSummary;
 import com.softwhistle.model.EntityAlreadyExistsException;
+import com.softwhistle.model.EntityNotFoundException;
 import com.softwhistle.model.EntityCreation;
 import com.softwhistle.model.EntityId;
 
 public class AccountService
 {
+    private static final Logger LOG = LoggerFactory.getLogger(AccountService.class);
+
     private final ServiceExchange serviceExchange;
     
     public AccountService(ServiceExchange serviceExchange) {
@@ -20,7 +26,7 @@ public class AccountService
     
     public EntityCreation create(AccountHolder user)
     {
-        if (serviceExchange.get(AccountsDao .class).holderExistsByEmail(user.email)) {
+        if (serviceExchange.get(AccountsDao.class).holderExistsByEmail(user.email)) {
             throw new EntityAlreadyExistsException("email", user.email, serviceExchange.get(AccountsDao.class).getHolderByEmail(user.email).id);
         }
         else {
@@ -30,22 +36,16 @@ public class AccountService
         }
     }
     
-    public EntityCreation create(Account account)
-    {
-        if ((account.holder != null) && (account.holder.id == null)) {
-            serviceExchange.get(AccountsDao.class).insert(account.holder);
-        }
-        serviceExchange.get(AccountsDao.class).insert(account);
-        return new EntityCreation().id(account.id).successful(true)
-                    .message("Your account was added to the system.");
-    }
-    
     public Account getById(Integer id) {
         return serviceExchange.get(AccountsDao.class).getById(id);
     }
 
     public AccountHolder getHolderById(Integer id) {
         return serviceExchange.get(AccountsDao.class).getHolderById(id);
+    }
+
+    public AccountHolder search(AccountHolder holder) {
+        return serviceExchange.get(AccountsDao.class).getHolderByEmail(holder.email);
     }
 
     public AccountManager managerFor(EntityId idPackager) {

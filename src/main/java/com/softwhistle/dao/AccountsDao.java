@@ -15,6 +15,9 @@ import javax.sql.DataSource;
 
 import com.google.common.base.Joiner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.softwhistle.jdbc.DaoStatementLocator;
 import com.softwhistle.jdbc.InsertResult;
 import com.softwhistle.jdbc.RowConverter;
@@ -27,17 +30,22 @@ import com.softwhistle.model.AccountHolder;
 
 public class AccountsDao
 {
+    private static final Logger LOG = LoggerFactory.getLogger(AccountsDao.class);
+
     private final SQLInsert holderInsert;
     private final SQLInsert accountInsert;
     private final SQLUpdate setAsPrimaryAccountForUpdate;
+    private final SQLUpdate accountUpdate;
 
     private final SQLQuery holderExistsByEmailSelect;
     private final SQLQuery holderByEmailSelect;
     private final SQLQuery holderByIdSelect;
     private final SQLQuery byIdSelect;
     private final SQLQuery byHolderIdSelect;
+    private final SQLQuery byHolderIdAndCodeSelect;
+    private final SQLQuery byHolderIdAndInstitutionSelect;
     
-    private final RowConverter<AccountHolder> baseAccountHolderRowConverter = (resultSet, valueUtility) ->
+    private final RowConverter<AccountHolder> indepthAccountHolderRowConverter = (resultSet, valueUtility) ->
         new AccountHolder()
             .id(valueUtility.convert(resultSet, Integer.class, "id"))
             .firstName(valueUtility.convert(resultSet, String.class, "firstName"))
@@ -46,8 +54,9 @@ public class AccountsDao
             .email(valueUtility.convert(resultSet, String.class, "email"))
             .primaryAccount(valueUtility.convertToOptional(resultSet, Integer.class, "primaryAccount.id")
                 .map(id -> new Account().id(id)).orElse(null));
-    
+
     private final RowConverter<Account> baseAccountRowConverter = new AccountRowConverter();
+    private final RowConverter<Account> indepthAccountRowConverter = new AccountRowConverter().expectHolderValues();
     
     public AccountsDao(DataSource datasource)
     {
@@ -56,9 +65,11 @@ public class AccountsDao
                  "VALUES (?, ?, ?, ?, ?)");
         
         accountInsert = new SQLInsert(datasource)
-            .sql("INSERT INTO account (account_holder_id, institution_name, institution_account_id, institution_account_name, established_by_institution_at)\n" +
-                 "VALUES (?, ?, ?, ?, ?)");
+            .sql("INSERT INTO account (account_holder_id, account_holder_code, institution_name, institution_account_id, institution_account_name, established_by_institution_at)\n" +
+                 "VALUES (?, ?, ?, ?, ?, ?)");
         
+        accountUpdate = new SQLUpdate(datasource).sql(new DaoStatementLocator(getClass(), "updateAccount"));
+
         setAsPrimaryAccountForUpdate = new SQLUpdate(datasource)
             .sql(new DaoStatementLocator(getClass(), "setAsPrimaryAccountForUpdate"));
 
@@ -76,8 +87,14 @@ public class AccountsDao
         
         byHolderIdSelect = new SQLQuery(datasource)
             .sql(new DaoStatementLocator(getClass(), "byHolderIdSelect"));
+
+        byHolderIdAndCodeSelect = new SQLQuery(datasource)
+            .sql(new DaoStatementLocator(getClass(), "byHolderIdAndCodeSelect"));
+
+        byHolderIdAndInstitutionSelect = new SQLQuery(datasource)
+            .sql(new DaoStatementLocator(getClass(), "byHolderIdAndInstitutionSelect"));
     }
-    
+
     public void insert(AccountHolder holder) {
         holderInsert.call(() -> asList(holder.firstName,
                 optMap(holder.intermediateNames, names -> Joiner.on(",").join(names)),
@@ -86,11 +103,19 @@ public class AccountsDao
     }
     
     public void insert(Account account) {
-        accountInsert.call(() -> asList(optMap(account.holder, h -> h.id), account.institutionName, account.institutionAccountId,
+        accountInsert.call(() -> asList(optMap(account.holder, h -> h.id), account.holderCode, account.institutionName, account.institutionAccountId,
                 account.institutionAccountName, account.establishedByInstitutionAt))
             .firstRowKey(account, Account::id);
     }
     
+    public void update(Account account) {
+        final List parameters = asList(optMap(account.holder, h -> h.id), account.holderCode, account.institutionName, account.institutionAccountId,
+                account.institutionAccountName, account.establishedByInstitutionAt, account.id);
+        LOG.info("Update parameter values: {}", parameters);
+        accountUpdate.call(() -> asList(optMap(account.holder, h -> h.id), account.holderCode, account.institutionName, account.institutionAccountId,
+                account.institutionAccountName, account.establishedByInstitutionAt, account.id));
+    }
+
     public void setAsPrimaryAccountFor(Integer holderId, Integer accountId) {
         setAsPrimaryAccountForUpdate.call(() -> asList(accountId, holderId));
     }
@@ -102,20 +127,28 @@ public class AccountsDao
     }
 
     public AccountHolder getHolderByEmail(String email) {
-        return holderByEmailSelect.call(() -> asList(email)).first(baseAccountHolderRowConverter)
+        return holderByEmailSelect.call(() -> asList(email)).first(indepthAccountHolderRowConverter)
                     .orElse(null);
     }
 
     public AccountHolder getHolderById(Integer id) {
-        return holderByIdSelect.call(() -> asList(id)).first(baseAccountHolderRowConverter)
+        return holderByIdSelect.call(() -> asList(id)).first(indepthAccountHolderRowConverter)
                     .orElse(null);
     }
     
     public Account getById(Integer id) {
-        return byIdSelect.call(() -> asList(id)).first(baseAccountRowConverter).orElse(null);
+        return byIdSelect.call(() -> asList(id)).first(indepthAccountRowConverter).orElse(null);
     }
     
+    public Account getByHolderIdAndCode(Integer holderId, String holderCode) {
+        return byHolderIdAndCodeSelect.call(() -> asList(holderId, holderCode)).first(baseAccountRowConverter).orElse(null);
+    }
+    
+    public Account getByHolderIdAndInstitution(Integer holderId, String institutionName, String institutionAccountId) {
+        return byHolderIdAndInstitutionSelect.call(() -> asList(holderId, institutionName, institutionAccountId)).first(baseAccountRowConverter).orElse(null);
+    }
+
     public Account getPrimaryByHolderId(Integer id) {
-        return byHolderIdSelect.call(() -> asList(id)).first(baseAccountRowConverter).orElse(null);
+        return byHolderIdSelect.call(() -> asList(id)).first(indepthAccountRowConverter).orElse(null);
     }
 }

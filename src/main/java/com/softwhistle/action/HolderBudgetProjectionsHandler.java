@@ -43,11 +43,14 @@ public class HolderBudgetProjectionsHandler implements Handler
                     toParam.value));
             }
         }
-        else if (aspect.equals("occurrences")) {
-            // TODO: create a model that combines a budget item's pertinent accounting
-            // items - amount, accounts, merchant - along with the item's calculated
-            // occurrences
-            renderObject(exchange, Arrays.asList(new FixedFieldOccurrences()));
+        else if (aspect.equals("occurrences"))
+        {
+            Holder<OffsetDateTime> fromParam = new Holder<OffsetDateTime>();
+            Holder<OffsetDateTime> toParam = new Holder<OffsetDateTime>();
+            if (dateTimeParamTransform.queryParamTo(exchange, "from", true, fromParam)
+                    && dateTimeParamTransform.queryParamTo(exchange, "to", true, toParam)) {
+                renderObject(exchange, managerFor(exchange).projectOccurrences(fromParam.value, toParam.value));
+            }
         }
     }
 

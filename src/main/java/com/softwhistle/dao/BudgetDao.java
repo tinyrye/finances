@@ -3,6 +3,7 @@ package com.softwhistle.dao;
 import static java.util.Arrays.asList;
 import static com.softwhistle.jdbc.StatementBuilder.eqCompIfNotNull;
 import static com.softwhistle.jdbc.StatementBuilder.inClause;
+import static com.softwhistle.jdbc.StatementBuilder.paramCsv;
 import static com.softwhistle.util.Values.optMap;
 
 import java.io.Serializable;
@@ -58,7 +59,7 @@ public class BudgetDao
     private final SQLQuery occurrenceScheduleTypeByIdSelect;
     private final DaoStatementLocator occurrenceScheduleTypesSelectStmt;
     private final SQLQuery customOccurrenceScheduleByIdSelect;
-    private final SQLQuery customOccurrenceSchedulesByIdsSelect;
+    private final DaoStatementLocator customOccurrenceSchedulesByIdsSelectStmt;
     private final SQLQuery fixedUnitOccurrencesByIdSelect;
     private final DaoStatementLocator fixedUnitOccurrencesSelectStmt;
     private final SQLQuery fixedFieldOccurrencesByIdSelect;
@@ -132,11 +133,9 @@ public class BudgetDao
         customOccurrenceScheduleByIdSelect = new SQLQuery(datasource)
             .sql(new DaoStatementLocator(BudgetDao.class, "customOccurrencesByIdSelect"));
         
-        customOccurrenceSchedulesByIdsSelect = new SQLQuery(datasource)
-            .sql(new DaoStatementLocator(BudgetDao.class, "customOccurrencesByIdsSelect"));
-        
         fixedUnitOccurrencesSelectStmt = new DaoStatementLocator(BudgetDao.class, "fixedUnitOccurrencesSelect");
         fixedFieldOccurrencesSelectStmt = new DaoStatementLocator(BudgetDao.class, "fixedFieldOccurrencesSelect");
+        customOccurrenceSchedulesByIdsSelectStmt = new DaoStatementLocator(BudgetDao.class, "customOccurrencesByIdsSelect");
 
         allBudgetItemsDelete = new SQLUpdate(datasource).sql(new DaoStatementLocator(
             BudgetDao.class, "allBudgetItemsDelete"));
@@ -325,8 +324,12 @@ public class BudgetDao
     
     protected Map<Integer,CustomOccurrenceSchedule> getCustomOccurrenceSchedulesByIds(List<Integer> ids)
     {
-        Map<Integer,CustomOccurrenceSchedule> byIds = new HashMap<Integer,CustomOccurrenceSchedule>();
-        customOccurrenceSchedulesByIdsSelect.call(() -> asList(ids))
+        final List<Object> parameterValues = new ArrayList<Object>();
+        final Map<Integer,CustomOccurrenceSchedule> byIds = new HashMap<Integer,CustomOccurrenceSchedule>();
+        new SQLQuery(datasource).sql(new StatementBuilder(customOccurrenceSchedulesByIdsSelectStmt)
+            .replacePlaceholder("idsPlaceholder", () -> paramCsv(ids, parameterValues, 0))
+            .toString()
+        ).call(() -> parameterValues)
             .process((rs, valUtil) -> {
                 Integer id = valUtil.convert(rs, Integer.class, "id");
                 if (! byIds.containsKey(id)) byIds.put(id, new CustomOccurrenceSchedule().id(id));

@@ -23,6 +23,7 @@ import com.softwhistle.model.AccountHolder;
 import com.softwhistle.model.Budget;
 import com.softwhistle.model.BudgetItem;
 import com.softwhistle.model.BudgetItemType;
+import com.softwhistle.model.BudgetLedgerItem;
 import com.softwhistle.model.EntityId;
 import com.softwhistle.model.EntityNotFoundException;
 import com.softwhistle.model.OccurrenceSchedule;
@@ -152,6 +153,21 @@ public class HolderBudgetManager
         listItems().stream().forEach(processor);
     }
     
+    public List<BudgetLedgerItem> projectOccurrences(OffsetDateTime from, OffsetDateTime to) {
+        final List<BudgetLedgerItem> transactions = new ArrayList<BudgetLedgerItem>();
+        final DoubleAccumulator sum = new DoubleAccumulator((curr, next) -> (curr + next), 0.0d);
+        processItems(item ->
+            item.transactsOn.occurrences(from, to).forEachRemaining(occurrence ->
+                transactions.add(new BudgetLedgerItem().item(item).transactsOn(occurrence))));
+        final List<BudgetLedgerItem> transactionsInOrder = transactions.stream().sorted((tx1, tx2) -> tx1.transactsOn.compareTo(tx2.transactsOn))
+            .collect(Collectors.toList());
+        transactionsInOrder.stream().forEach(transaction -> {
+            sum.accumulate(transaction.item.amount);
+            transaction.ledgerTotal = sum.get();
+        });
+        return transactionsInOrder;
+    }
+
     public Double projectExpenditures(OffsetDateTime from, OffsetDateTime to)
     {
         DoubleAccumulator sum = new DoubleAccumulator((curr, next) -> (curr + next), 0.0d);

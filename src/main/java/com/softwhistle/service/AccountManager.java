@@ -14,7 +14,9 @@ import com.softwhistle.model.AccountHolder;
 import com.softwhistle.model.AccountSummary;
 import com.softwhistle.model.EntityId;
 import com.softwhistle.model.EntityNotFoundException;
+import com.softwhistle.model.EntityPropertyMissing;
 import com.softwhistle.util.Loader;
+import com.softwhistle.util.CaseSupplier;
 
 public class AccountManager
 {
@@ -68,8 +70,55 @@ public class AccountManager
     }
 
     public AccountManager create(Account account) {
-        serviceExchange.get(AccountsDao.class).insert(account);
-        this.account = serviceExchange.get(AccountsDao.class).getById(account.id);
+        if (account.holder == null) {
+            account.holder = holder.get();
+        }
+        final AccountHolder resolvedHolder;
+        if (account.holder.id == null) {
+            AccountHolder holderByEmail = serviceExchange.get(AccountsDao.class).getHolderByEmail(account.holder.email);
+            if (holderByEmail != null) {
+                resolvedHolder = holderByEmail;
+            }
+            else {
+                serviceExchange.get(AccountsDao.class).insert(account.holder);
+                resolvedHolder = account.holder;
+            }
+        }
+        else {
+            if (serviceExchange.get(AccountsDao.class).getHolderById(account.holder.id) == null) {
+                throw new EntityNotFoundException(EntityId.of(account.holder.id, AccountHolder.class));
+            }
+            resolvedHolder = account.holder;
+        }
+        account.holder = resolvedHolder;
+
+        // Avoid record duplication if user is specifying some unique values
+        final Account existingAccount = new CaseSupplier<Account,Account>().on(a ->
+                a.holderCode != null
+            ).give(() -> {
+                LOG.info("Looking up existing account under holder: holderId={}; holderCode={}", new Object[] {
+                    account.holder.id, account.holderCode
+                });
+                return serviceExchange.get(AccountsDao.class).getByHolderIdAndCode(account.holder.id, account.holderCode);
+            }).on(a ->
+                a.institutionName != null && a.institutionAccountId != null
+            ).give(() -> {
+                LOG.info("Looking up existing account under holder: holderId={}; institutionName={}; institutionAccountId={}", new Object[] {
+                    account.holder.id, account.institutionName, account.institutionAccountId
+                });
+                return serviceExchange.get(AccountsDao.class).getByHolderIdAndInstitution(account.holder.id, account.institutionName, account.institutionAccountId);
+            }).requireNotNull().apply(account);
+
+        if (existingAccount == null) {
+            LOG.info("Did not find account under holder: account={}", account);
+            serviceExchange.get(AccountsDao.class).insert(account);
+        }
+        else {
+            account.id = existingAccount.id;
+            LOG.info("Did not find account under holder: account={}", account);
+            serviceExchange.get(AccountsDao.class).update(account);
+        }
+        this.account = account;
         return this;
     }
 

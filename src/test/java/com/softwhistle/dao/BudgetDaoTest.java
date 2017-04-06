@@ -66,4 +66,9 @@ public class BudgetDaoTest
 		assertThat(actualOccurrences.next(), equalTo(testSchedule.occurrences.get(2)));
 		assertThat(actualOccurrences.hasNext(), is(false));
 	}
+
+	@Test
+	public void testGetCustomOccurrenceSchedulesByIds() {
+		testedObject.getCustomOccurrenceSchedulesByIds(asList(1, 2, 3));
+	}
 }

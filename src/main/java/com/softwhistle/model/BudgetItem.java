@@ -5,6 +5,10 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import com.softwhistle.serialization.AccountJsonDeserializer;
+
 public class BudgetItem implements Serializable
 {
     public Integer id;
@@ -12,6 +16,7 @@ public class BudgetItem implements Serializable
     public Double amount;
     public String description;
     public OccurrenceSchedule transactsOn;
+    @JsonDeserialize(using=AccountJsonDeserializer.class)
     public Account holderAccount;
     public String merchant;
     public Account merchantAccount;
